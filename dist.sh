@@ -1,14 +1,31 @@
 #!/usr/bin/env bash
-echo " :: Create package..."
+
+
+# ======================================================================
+echo -e "\n :: Update tag??..."
+
+
+# ======================================================================
+echo -e "\n :: Create change log..."
+CHANGELOG=CHANGELOG.txt
+echo -e "Change Log\n==========\n" > ${CHANGELOG}
+git log --oneline --decorate --graph >> ${CHANGELOG}
+echo -e "${CHANGELOG} successfully created."
+
+
+# ======================================================================
+echo -e "\n :: Create package..."
 python setup.py bdist_wheel --universal
 
-echo " :: Distribute package..."
+
+# ======================================================================
+echo -e "\n :: Distribute package..."
 PYPIRC_EXT=pypirc
 if [ -z "$1" ]; then
     for FILE in *.${PYPIRC_EXT}; do
         CHOICE=${FILE%\.*}"|"$CHOICE
     done
-    echo -n "choose target ["${CHOICE%?}"]: "
+    echo -e -n "choose target ["${CHOICE%?}"]: "
     read PYPIRC
 else
     PYPIRC=$1
