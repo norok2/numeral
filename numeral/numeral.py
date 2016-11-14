@@ -20,7 +20,7 @@ import doctest  # Test interactive Python examples
 
 # ======================================================================
 # :: Version
-__version__ = '0.1.0.2.dev2+ngcce8f8a.d20161114'
+__version__ = '0.1.0.3.dev0+nged950b6.d20161114'
 
 # ======================================================================
 # :: Project Details

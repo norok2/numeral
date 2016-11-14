@@ -116,15 +116,22 @@ setup(
         'Programming Language :: Python :: 3',
     ],
 
-    keywords='numeral letter alphabet numeric arabic roman',
+    keywords=('numeral', 'letter', 'alphabet', 'numeric', 'arabic', 'roman'),
 
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+
+    setup_requires=[
+        'setuptools',
+        'setuptools_scm'
+    ],
+
+    extras_require={
+        'blessed': 'blessed',
+    },
 
     entry_points={
         'console_scripts': [
             'numeral=numeral.numeral:main',
         ],
     },
-
-    setup_requires=['setuptools_scm'],
 )
