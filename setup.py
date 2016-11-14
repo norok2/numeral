@@ -33,7 +33,7 @@ with open(os.path.join(cwd, 'README'), encoding='utf-8') as readme_file:
 # ======================================================================
 def fix_version(
         version=None,
-        source_filepath='hdu/hdu.py'):
+        source_filepath='numeral/numeral.py'):
     """
     Fix version in source code.
 
@@ -65,15 +65,15 @@ version_text = fix_version()
 # ======================================================================
 # :: call the setup tool
 setup(
-    name='hdu',
+    name='numeral',
 
-    description='Human-friendly summary of disk usage.',
+    description='Support for various integer-to-numeral (and back) conversion.',
     long_description=long_description_text,
 
     # use_scm_version=True,
     version=version_text,
 
-    url='https://bitbucket.org/norok2/hdu',
+    url='https://bitbucket.org/norok2/numeral',
 
     author='Riccardo Metere',
     author_email='rick@metere.it',
@@ -84,12 +84,21 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
 
-        'Intended Audience :: System Administrators',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'Intended Audience :: Education',
 
-        'Topic :: System :: Shells',
-        'Topic :: System :: Systems Administration',
-        'Topic :: System :: Filesystems',
-        'Topic :: System :: Monitoring',
+        'Natural Language :: English',
+        'Natural Language :: Latin',
+
+        'Topic :: Software Development',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: Software Development :: Localization',
+        'Topic :: Text Processing',
+        'Topic :: Text Processing :: Linguistic',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Sociology :: History',
+        'Topic :: Education',
         'Topic :: Utilities',
 
         'Operating System :: POSIX',
@@ -102,19 +111,13 @@ setup(
         'Programming Language :: Python :: 3',
     ],
 
-    keywords='hdu du disk usage console cli tui',
+    keywords='numeral letter alphabet numeric arabic roman',
 
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
-    # package_data={
-    #     'license': ['LICENSE'],
-    # },
-
-    # data_files=[('my_data', ['data/data_file'])],
-
     entry_points={
         'console_scripts': [
-            'hdu=hdu.hdu:main',
+            'numeral=numeral.numeral:main',
         ],
     },
 

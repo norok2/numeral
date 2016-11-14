@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Numeral: integer-to-numeral conversion.
+Numeral: support for various integer-to-numeral (and back) conversion.
 """
 
 # ======================================================================
@@ -54,7 +54,6 @@ _ROMAN_APOSTROPHUS = collections.OrderedDict((
     ('ↀ', 1000), ('ↁ', 5000), ('ↂ', 10000), ('ↇ', 50000), ('ↈ', 100000)))
 _ROMAN_APOSTROPHUS_R = collections.OrderedDict(
     [(v, k) for k, v in sorted(_ROMAN_APOSTROPHUS.items(), reverse=True)])
-_ROMAN_ARCHAIC = (('Ⅵ', 'ↅ'), ('Ⅼ', 'ↆ'))
 _ROMAN_CLAUDIAN_TO_APOSTROPHUS = (
     ('ⅭⅭↀↃↃ', 'ↈ'), ('ⅮↃↃ', 'ↇ'), ('ⅭↀↃ', 'ↂ'), ('ⅮↃ', 'ↁ'))
 _ROMAN_CLAUDIAN_TO_APOSTROPHUS_R = tuple(
@@ -86,6 +85,9 @@ _ROMAN_MINUS = '-'
 _ROMAN_MAX_CONSECUTIVE = {True: 4, False: 3}  # key -> `only_additive` option
 _ROMAN_STRICT_REGEX = \
     r'^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$'
+
+# ======================================================================
+ROMAN_ALTERNATIVES = (('Ⅵ', 'ↅ'), ('Ⅼ', 'ↆ'), ('Ⅿ', 'ↀ'))
 
 
 # ======================================================================
@@ -122,8 +124,9 @@ def int2roman(
         extended=True,
         uppercase=True,
         claudian=False,
-        archaic=False,
-        signed=True):
+        alternatives=None,
+        signed=True,
+        negative_sign=_ROMAN_MINUS):
     """
     Convert an integer to its corresponding Roman number representation.
 
@@ -145,11 +148,13 @@ def int2roman(
         uppercase (bool): Use uppercase for the output.
             If False, the output is converted to lowercase.
         claudian (bool): Force the use of Claudian for apostrophus notation.
-        archaic (bool): Use archaic symbols for `6` and `50`.
-            This is option is here mostly for completeness.
+        alternatives (iterable[iterable[str]]): Use alternate symbols.
+            Mostly useful in conjunction with ROMAN_ALTERNATIVES
         signed (bool): Accept negative numbers.
             The minus symbol is then prepended to string for negative numbers.
             No symbol is added for positive numbers.
+        negative_sign (str): The symbol to use for negative numbers.
+            The negative sign will be the first character of the representation.
 
     Returns:
         text (str): The converted Roman number.
@@ -183,8 +188,9 @@ def int2roman(
         ['ⅿⅾⅽⅼⅹⅵ', 'ⅿⅿⅽⅽⅼⅹⅼⅶ', 'ⅿⅿⅾⅽⅾⅹⅹⅷ', 'ⅿⅿⅿⅾⅼⅸ', 'ⅿⅾↄⅽⅼⅹⅼ', 'ⅿⅾↄⅾⅽⅽⅽⅹⅺ']
         >>> [int2roman(i, claudian=True) for i in [1666, 3999, 4000, 189000]]
         ['ⅯⅮⅭⅬⅩⅥ', 'ⅯⅯⅯⅮⅭⅮⅬⅩⅬⅨ', 'ⅯⅮↃ', 'ⅭⅭↀↃↃⅮↃↃⅭↀↃⅭↀↃⅭↀↃⅮↃⅯⅮↃ']
-        >>> [int2roman(i, archaic=True) for i in [26, 27, 55, 56, 59]]
-        ['ⅩⅩↅ', 'ⅩⅩⅦ', 'ↆⅤ', 'ↆↅ', 'ↆⅨ']
+        >>> [int2roman(i, alternatives=ROMAN_ALTERNATIVES)
+        ...  for i in [6, 50, 1000, 56, 1006, 1050, 1056, 1057]]
+        ['ↅ', 'ↆ', 'ↀ', 'ↆↅ', 'ↀↅ', 'ↀↆ', 'ↀↆↅ', 'ↀↆⅦ']
         >>> [int2roman(i, signed=False) for i in [1666, -1666]]
         Traceback (most recent call last):
             ....
@@ -196,7 +202,7 @@ def int2roman(
     # handles negative numbers
     if num < 0:
         if signed:
-            text += _ROMAN_MINUS
+            text += negative_sign
             num = abs(num)
         else:
             raise ValueError('`{}` needs `signed` option'.format(num))
@@ -252,8 +258,8 @@ def int2roman(
     text = multi_replace(text, (('ⅩⅠ', 'Ⅺ'), ('ⅩⅡ', 'Ⅻ')))
     if only_additive:
         text = multi_replace(text, (('Ⅳ', 'ⅡⅡ'), ('Ⅸ', 'ⅦⅡ')))
-    if archaic:
-        text = multi_replace(text, _ROMAN_ARCHAIC)
+    if alternatives:
+        text = multi_replace(text, alternatives)
     if only_ascii:
         text = multi_replace(text, _ROMAN_UNICODE_TO_ASCII)
     if not uppercase:
@@ -264,7 +270,11 @@ def int2roman(
 
 
 # ======================================================================
-def roman2int(text, strict=False, strict_regex=_ROMAN_STRICT_REGEX):
+def roman2int(
+        text,
+        strict=False,
+        strict_regex=_ROMAN_STRICT_REGEX,
+        negative_sign=_ROMAN_MINUS):
     """
     Convert a string representation of a Roman number to integer.
 
@@ -279,6 +289,11 @@ def roman2int(text, strict=False, strict_regex=_ROMAN_STRICT_REGEX):
               symbol of next lower value to be placed on the left of a larger
               value symbol (this is to avoid the necessity for repeating the
               same symbol 4 times).
+        strict_regex (str): The regular expression defining formal correctness.
+            This must be a valid expression accepted by Python's `re.match()`.
+            If `strict` is False, this parameter is ignored.
+        negative_sign (str): The symbol to use for negative numbers.
+            The negative sign must be the first character of the representation.
 
     Returns:
         num (int): The integer represented.
@@ -321,13 +336,13 @@ def roman2int(text, strict=False, strict_regex=_ROMAN_STRICT_REGEX):
     """
     num = None
     text = text.strip().upper()
-    if _ROMAN_MINUS in text and text[0] == _ROMAN_MINUS:
+    if negative_sign in text and text[0] == negative_sign:
         sign = -1
         text = text[1:]
     else:
         sign = 1
     text = multi_replace(text, _ROMAN_UNICODE_TO_ASCII)
-    text = multi_replace(text, tuple([(i, j) for (j, i) in _ROMAN_ARCHAIC]))
+    text = multi_replace(text, tuple([(i, j) for (j, i) in ROMAN_ALTERNATIVES]))
     valid_chars = set(''.join([a for u, a in _ROMAN_UNICODE_TO_ASCII]))
     if set(text).issubset(valid_chars):
         num = 0
@@ -357,7 +372,8 @@ def roman2int(text, strict=False, strict_regex=_ROMAN_STRICT_REGEX):
 # ======================================================================
 def int2letter(
         num,
-        alphabet=string.ascii_lowercase):
+        alphabet=string.ascii_lowercase,
+        negative_sign='-'):
     """
     Convert a number to the least amount letters (within an alphabet).
 
@@ -369,6 +385,8 @@ def int2letter(
         num (int): The input number to convert.
         alphabet (str): The alphabet to use for the representation.
             Characters within the alphabet must not repeat.
+        negative_sign (str): The symbol to use for negative numbers.
+            The negative sign will be the first character of the representation.
 
     Returns:
         text (str): The integer represented.
@@ -378,19 +396,20 @@ def int2letter(
         ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n']
         >>> [int2letter(i) for i in [23, 26, 27, 28, 29, 702, 703, 704, 1983]]
         ['x', 'aa', 'ab', 'ac', 'ad', 'aaa', 'aab', 'aac', 'bxh']
-        >>> for n in range(100):
-        ...     assert(n == letter2int(int2letter(n)))
+        >>> all([n == letter2int(int2letter(n)) for n in range(-999, 99)])
+        True
 
     See Also:
         letter2int(), tokens2int(), int2tokens()
     """
-    return int2tokens(num, alphabet)
+    return int2tokens(num, alphabet, negative_sign)
 
 
 # ======================================================================
 def letter2int(
         text,
-        alphabet=string.ascii_lowercase):
+        alphabet=string.ascii_lowercase,
+        negative_sign='-'):
     """
     Convert a group of letters (within a given alphabet) to a number.
 
@@ -402,30 +421,50 @@ def letter2int(
         text (str): The input string to parse.
         alphabet (str): The alphabet to use for the representation.
             Characters within the alphabet must not repeat.
+        negative_sign (str): The symbol to use for negative numbers.
+            The negative sign must be the first character of the representation.
 
     Returns:
         num (int): The integer represented.
 
+    Raises:
+        ValueError: if text contains non-alphabet characters
+        ValueError: if `negative_sign` is in `alphabet`
+        ValueError: if `negative_sign` is present but not the first item
+
     Examples:
         >>> [letter2int(s) for s in ['a', 'z', 'aa', 'ad', 'aaa', 'aab', 'bxh']]
         [0, 25, 26, 29, 702, 703, 1983]
-        >>> for n in range(100, 200):
-        ...     assert(n == letter2int(int2letter(n)))
+        >>> all([n == letter2int(int2letter(n)) for n in range(-99, 999)])
+        True
 
     See Also:
         int2letter(), tokens2int(), int2tokens()
     """
     num = 0
+    sign = 1
+    text = text.strip()
+    if negative_sign in alphabet:
+        raise ValueError('Alphabet and negative sign must not overlap')
+    if negative_sign in text:
+        if text[0] == negative_sign:
+            text = text[1:]
+            sign = -1
+        else:
+            raise ValueError('Negative sign is in wrong position')
+    if not set(text).issubset(set(alphabet)):
+        raise ValueError('Text contains invalid characters')
     for i, letter in enumerate(text[::-1]):
         offset = 0 if i == 0 else 1
         num += (alphabet.index(letter) + offset) * len(alphabet) ** i
-    return num
+    return num * sign
 
 
 # ======================================================================
 def int2tokens(
         num,
-        tokens):
+        tokens,
+        negative_sign='-'):
     """
     Convert a group of tokens (within a given set) to a number.
 
@@ -437,6 +476,8 @@ def int2tokens(
         num (int): The input number to convert.
         tokens (iterable[str]): The tokens to use for the representation.
             Items within the tokens set must not repeat or overlap.
+        negative_sign (str): The symbol to use for negative numbers.
+            The negative sign will be the first character of the representation.
 
     Returns:
         text (str): The integer represented.
@@ -453,23 +494,29 @@ def int2tokens(
         >>> int2tokens(161, ('po', 'ta'))
         'potapopopotata'
         >>> d = ('mo', 'no', 'ke')
-        >>> for n in range(100):
-        ...     assert(n == tokens2int(int2tokens(n, d), d))
+        >>> all([n == tokens2int(int2tokens(n, d), d) for n in range(-999, 99)])
+        True
 
     See Also:
         letter2int(), int2letter(), tokens2int()
     """
     text = ''
+    if num < 0:
+        sign_text = negative_sign
+        num = abs(num)
+    else:
+        sign_text = ''
     while num >= 0:
         text = tokens[num % len(tokens)] + text
         num = num // len(tokens) - 1
-    return text
+    return sign_text + text
 
 
 # ======================================================================
 def tokens2int(
         text,
-        tokens):
+        tokens,
+        negative_sign='-'):
     """
     Convert a number to the least amount tokens (within a tokens set).
 
@@ -481,6 +528,8 @@ def tokens2int(
         text (str): The input string to parse.
         tokens (iterable[str]): The tokens to use for the representation.
             Items within the tokens set must not repeat or overlap.
+        negative_sign (str): The symbol to use for negative numbers.
+            The negative sign must be the first character of the representation.
 
     Returns:
         num (int): The integer represented.
@@ -491,13 +540,25 @@ def tokens2int(
         >>> tokens2int('potapopopotata', ('po', 'ta'))
         161
         >>> d = ('mo', 'no', 'ke')
-        >>> for n in range(100, 200):
-        ...     assert(n == tokens2int(int2tokens(n, d), d))
+        >>> all([n == tokens2int(int2tokens(n, d), d) for n in range(-99, 999)])
+        True
 
     See Also:
         letter2int(), int2letter(), int2tokens()
     """
     num = 0
+    sign = 1
+    text = text.strip()
+    if negative_sign in tokens:
+        raise ValueError('Negative sign must not be a token')
+    if negative_sign in text:
+        if text[0] == negative_sign:
+            text = text[1:]
+            sign = -1
+        else:
+            raise ValueError('Negative sign is in wrong position')
+    if not set(text).issubset(set(''.join(tokens))):
+        raise ValueError('Text contains invalid characters')
     i = 0
     found = True
     while text or not found:
@@ -509,7 +570,7 @@ def tokens2int(
                 num += (j + offset) * len(tokens) ** i
                 found = True
                 i += 1
-    return num
+    return num * sign
 
 
 # ======================================================================
