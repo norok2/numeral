@@ -73,7 +73,7 @@ setup(
     name='numeral',
 
     description='Support for various integer-to-numeral (and back) conversion.',
-    long_description=long_description_text,
+    long_description=LONG_DESCRIPTION_TEXT,
 
     # use_scm_version=True,
     version=version_text,
