@@ -62,10 +62,9 @@ def fix_version(
 
     with open(source_filepath, 'w') as src_file:
         src_file.write(src_str.encode('utf-8'))
+
     return version
 
-
-version_text = fix_version()
 
 # ======================================================================
 # :: call the setup tool
@@ -76,7 +75,7 @@ setup(
     long_description=LONG_DESCRIPTION_TEXT,
 
     # use_scm_version=True,
-    version=version_text,
+    version=fix_version(),
 
     url='https://bitbucket.org/norok2/numeral',
 
