@@ -15,6 +15,7 @@ import collections  # Container datatypes
 import string  # Common string operations
 import functools  # Higher-order functions and operations on callable objects
 import math  # Mathematical functions
+import re  # Regular expression operations
 import doctest  # Test interactive Python examples
 
 # ======================================================================
@@ -40,38 +41,51 @@ You are welcome to redistribute it under its terms and conditions.
 _ROMAN_UNICODE_UPPER = collections.OrderedDict((
     ('Ⅰ', 1), ('Ⅱ', 2), ('Ⅲ', 3), ('Ⅳ', 4), ('Ⅴ', 5), ('Ⅵ', 6),
     ('Ⅶ', 7), ('Ⅷ', 8), ('Ⅸ', 9), ('Ⅹ', 10), ('Ⅺ', 11), ('Ⅻ', 12),
-    ('Ⅼ', 50), ('Ⅽ', 100), ('Ⅾ', 500), ('Ⅿ', 1000), ('Ↄ', None), ('N', 0)))
+    ('Ⅼ', 50), ('Ⅽ', 100), ('Ⅾ', 500), ('Ⅿ', 1000), ('N', 0), ('Ↄ', None)))
 _ROMAN_UNICODE_LOWER = collections.OrderedDict((
     ('ⅰ', 1), ('ⅱ', 2), ('ⅲ', 3), ('ⅳ', 4), ('ⅴ', 5), ('ⅵ', 6),
     ('ⅶ', 7), ('ⅷ', 8), ('ⅸ', 9), ('ⅹ', 10), ('ⅺ', 11), ('ⅻ', 12),
-    ('ⅼ', 50), ('ⅽ', 100), ('ⅾ', 500), ('ⅿ', 1000), ('ↄ', None), ('n', 0)))
+    ('ⅼ', 50), ('ⅽ', 100), ('ⅾ', 500), ('ⅿ', 1000), ('n', 0), ('ↄ', None)))
 _ROMAN_UNICODE = _ROMAN_UNICODE_UPPER
-_ROMAN_APOSTROPHUS = collections.OrderedDict((
-    ('ↀ', 1000), ('ↁ', 5000), ('ↂ', 10000), ('ↇ', 50000), ('ↈ', 100000)))
-_ROMAN_ARCHAIC = (('Ⅵ', 'ↅ'), ('Ⅼ', 'ↆ'))
 _ROMAN_UNICODE_R = collections.OrderedDict(
     [(v, k) for k, v in sorted(_ROMAN_UNICODE.items(), reverse=True)
      if v is not None])
+_ROMAN_APOSTROPHUS = collections.OrderedDict((
+    ('ↀ', 1000), ('ↁ', 5000), ('ↂ', 10000), ('ↇ', 50000), ('ↈ', 100000)))
 _ROMAN_APOSTROPHUS_R = collections.OrderedDict(
     [(v, k) for k, v in sorted(_ROMAN_APOSTROPHUS.items(), reverse=True)])
+_ROMAN_ARCHAIC = (('Ⅵ', 'ↅ'), ('Ⅼ', 'ↆ'))
+_ROMAN_CLAUDIAN_TO_APOSTROPHUS = (
+    ('ⅭⅭↀↃↃ', 'ↈ'), ('ⅮↃↃ', 'ↇ'), ('ⅭↀↃ', 'ↂ'), ('ⅮↃ', 'ↁ'))
+_ROMAN_CLAUDIAN_TO_APOSTROPHUS_R = tuple(
+    [(v, k) for k, v in _ROMAN_CLAUDIAN_TO_APOSTROPHUS])
+_ROMAN_CLAUDIAN_TO_ASCII = 'O'  # arbitrarily chosen ASCII equivalent of `Ↄ`
 _ROMAN_UNICODE_TO_ASCII = (
     ('Ⅰ', 'I'), ('Ⅱ', 'II'), ('Ⅲ', 'III'), ('Ⅳ', 'IV'), ('Ⅴ', 'V'),
     ('Ⅵ', 'VI'), ('Ⅶ', 'VII'), ('Ⅷ', 'VIII'), ('Ⅸ', 'IX'), ('Ⅹ', 'X'),
     ('Ⅺ', 'XI'), ('Ⅻ', 'XII'), ('Ⅼ', 'L'), ('Ⅽ', 'C'), ('Ⅾ', 'D'),
-    ('Ⅿ', 'M'), ('ↅ', 'VI'), ('ↀ', 'CD'), ('ↆ', 'L'), ('Ↄ', 'O'),
-    ('ↁ', 'DO'), ('ↂ', 'CCDO'), ('ↇ', 'DOO'), ('ↈ', 'CCCDOO'))
-_ROMAN_ASCII_UPPER = (
+    ('Ⅿ', 'M'), ('ↅ', 'VI'), ('ↀ', 'CD'), ('ↆ', 'L'), ('N', 'N'),
+    ('Ↄ', _ROMAN_CLAUDIAN_TO_ASCII),
+    ('ↁ', 'D' + _ROMAN_CLAUDIAN_TO_ASCII),
+    ('ↂ', 'CCD' + _ROMAN_CLAUDIAN_TO_ASCII),
+    ('ↇ', 'D' + _ROMAN_CLAUDIAN_TO_ASCII * 2),
+    ('ↈ', 'CCCD' + _ROMAN_CLAUDIAN_TO_ASCII * 2))
+_ROMAN_ASCII_UPPER = collections.OrderedDict((
     ('I', 1), ('V', 5), ('X', 10), ('L', 50),
-    ('C', 100), ('D', 500), ('M', 1000), ('N', 0))
-_ROMAN_ASCII_LOWER = (
+    ('C', 100), ('D', 500), ('M', 1000), ('N', 0),
+    (_ROMAN_CLAUDIAN_TO_ASCII, None)))
+_ROMAN_ASCII_LOWER = collections.OrderedDict((
     ('i', 1), ('v', 5), ('x', 10), ('l', 50),
-    ('c', 100), ('d', 500), ('m', 1000), ('n', 0))
+    ('cⅽ', 100), ('d', 500), ('m', 1000), ('n', 0),
+    (_ROMAN_CLAUDIAN_TO_ASCII.lower(), None)))
 _ROMAN_ASCII = _ROMAN_ASCII_UPPER
-
-
-# ======================================================================
-def _roman_max_consecutive(only_additive):
-    return 4 if only_additive else 3
+_ROMAN_ASCII_R = collections.OrderedDict(
+    [(v, k) for k, v in sorted(_ROMAN_ASCII.items(), reverse=True)
+     if v is not None])
+_ROMAN_MINUS = '-'
+_ROMAN_MAX_CONSECUTIVE = {True: 4, False: 3}  # key -> `only_additive` option
+_ROMAN_STRICT_REGEX = \
+    r'^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$'
 
 
 # ======================================================================
@@ -107,22 +121,40 @@ def int2roman(
         only_additive=False,
         extended=True,
         uppercase=True,
-        claudian=True,
+        claudian=False,
         archaic=False,
         signed=True):
     """
+    Convert an integer to its corresponding Roman number representation.
 
     Args:
-        num ():
-        only_ascii (bool):
-        only_additive (bool):
-        extended (bool):
-        uppercase (bool):
-        claudian (bool):
-        archaic (bool):
-        signed (bool):
+        num (int): The input number to convert
+        only_ascii (bool): Force the use of only-ASCII characters.
+            If True only valid ASCII characters are used.
+            The Apostrophus notation is forced to expand using the Claudian
+            symbol (a specular C), which is in turn converted to a valid ASCII
+            character with some resemblance to it, i.e. the letter `O`.
+        only_additive (bool): Force only-additive notation.
+            This means that the symbols are strictly sorted according decreasing
+            value left-to-right and they all add up.
+            Otherwise, a single lower-value symbol preceding a larger-value one
+            is used to indicate subtraction, thus avoiding 4 symbols repetition.
+        extended (bool): Allow for 0 and large numbers to be included.
+            Large numbers are above 3999 if `only_additive` is False,
+            otherwise they are above 4999.
+        uppercase (bool): Use uppercase for the output.
+            If False, the output is converted to lowercase.
+        claudian (bool): Force the use of Claudian for apostrophus notation.
+        archaic (bool): Use archaic symbols for `6` and `50`.
+            This is option is here mostly for completeness.
+        signed (bool): Accept negative numbers.
+            The minus symbol is then prepended to string for negative numbers.
+            No symbol is added for positive numbers.
 
     Returns:
+        text (str): The converted Roman number.
+            By default the dedicated uppercase Unicode characters are used.
+            This can be tweaked through the appropriate options.
 
     Examples:
         >>> [int2roman(i) for i in range(13)]
@@ -133,23 +165,38 @@ def int2roman(
         ['ⅩⅬⅣ', 'ⅬⅠ', 'ⅬⅫ', 'ⅬⅩⅩⅢ', 'ⅬⅩⅩⅩⅣ', 'ⅬⅩⅬⅤ', 'ⅬⅩⅬⅨ']
         >>> [int2roman(i) for i in range(1666, 3999, 517)]
         ['ⅯⅮⅭⅬⅩⅥ', 'ⅯⅯⅭⅬⅩⅩⅩⅢ', 'ⅯⅯⅮⅭⅭ', 'ⅯⅯⅯⅭⅭⅩⅦ', 'ⅯⅯⅯⅮⅭⅭⅩⅩⅩⅣ']
+        >>> [int2roman(i) for i in range(-1666, 1666, 639)]
+        ['-ⅯⅮⅭⅬⅩⅥ', '-ⅯⅩⅩⅦ', '-ⅭⅭⅭⅬⅩⅩⅩⅧ', 'ⅭⅭⅬⅠ', 'ⅮⅭⅭⅭⅬⅩⅬ', 'ⅯⅮⅩⅩⅨ']
+        >>> [int2roman(k * 10 ** i) for i in range(3, 6) for k in [4, 5, 10]]
+        ['Ⅿↁ', 'ↁ', 'ↂ', 'ↂↇ', 'ↇ', 'ↈ', 'ↈↇↃ', 'ↇↃ', 'ⅭↈↃ']
         >>> [int2roman(2 ** i) for i in range(14, 17)]
-        ['ⅭↀↃⅮↃⅯⅭⅭⅭⅬⅩⅩⅩⅣ', 'ⅭↀↃⅭↀↃⅭↀↃⅯⅯⅮⅭⅭⅬⅩⅧ', 'ⅮↃↃⅭↀↃⅮↃⅮⅩⅩⅩⅥ']
-        >>> [int2roman(i) for i in [4000, 40000, 5000, 10000, 50000, 100000]]
-        ['MⅮↃ', 'ⅭↀↃⅮↃↃ', 'ⅮↃ', 'ⅭↀↃ', 'ⅮↃↃ', 'ⅭⅭↀↃↃ']
+        ['ↂↁⅯⅭⅭⅭⅬⅩⅩⅩⅣ', 'ↂↂↂⅯⅯⅮⅭⅭⅬⅩⅧ', 'ↇↂↁⅮⅩⅩⅩⅥ']
+        >>> [int2roman(i, only_ascii=True) for i in [1666, 3999, 4000, 189000]]
+        ['MDCLXVI', 'MMMDCDLXLIX', 'MDO', 'CCCDOODOOCCDOCCDOCCDODOMDO']
+        >>> [int2roman(i, only_additive=True) for i in [4, 49, 949, 9494]]
+        ['ⅡⅡ', 'ⅩⅩⅩⅩⅦⅡ', 'ⅮⅭⅭⅭⅭⅩⅩⅩⅩⅦⅡ', 'ↁⅯⅯⅯⅯⅭⅭⅭⅭⅬⅩⅩⅩⅩⅡⅡ']
+        >>> [int2roman(i, extended=False) for i in range(3995, 4001)]
+        Traceback (most recent call last):
+            ....
+        ValueError: `4000` needs `extended` option
+        >>> [int2roman(i, uppercase=False) for i in range(1666, 5000, 631)]
+        ['ⅿⅾⅽⅼⅹⅵ', 'ⅿⅿⅽⅽⅼⅹⅼⅶ', 'ⅿⅿⅾⅽⅾⅹⅹⅷ', 'ⅿⅿⅿⅾⅼⅸ', 'ⅿⅾↄⅽⅼⅹⅼ', 'ⅿⅾↄⅾⅽⅽⅽⅹⅺ']
+        >>> [int2roman(i, claudian=True) for i in [1666, 3999, 4000, 189000]]
+        ['ⅯⅮⅭⅬⅩⅥ', 'ⅯⅯⅯⅮⅭⅮⅬⅩⅬⅨ', 'ⅯⅮↃ', 'ⅭⅭↀↃↃⅮↃↃⅭↀↃⅭↀↃⅭↀↃⅮↃⅯⅮↃ']
         >>> [int2roman(i, archaic=True) for i in [26, 27, 55, 56, 59]]
         ['ⅩⅩↅ', 'ⅩⅩⅦ', 'ↆⅤ', 'ↆↅ', 'ↆⅨ']
-        >>> [int2roman(i, only_ascii=True) for i in [1666, 3999, 4000, 16384]]
-        ['MDCLXVI', 'MMMDCDLXLIX', 'MDO', 'CCDODOMCCCLXXXIV']
-
+        >>> [int2roman(i, signed=False) for i in [1666, -1666]]
+        Traceback (most recent call last):
+            ....
+        ValueError: `-1666` needs `signed` option
     """
     text = ''
     # update max_consecutive
-    max_consecutive = _roman_max_consecutive(only_additive)
+    max_consecutive = _ROMAN_MAX_CONSECUTIVE[only_additive]
     # handles negative numbers
     if num < 0:
         if signed:
-            text += '-'
+            text += _ROMAN_MINUS
             num = abs(num)
         else:
             raise ValueError('`{}` needs `signed` option'.format(num))
@@ -163,10 +210,11 @@ def int2roman(
         last_key, prev_key = None, None
         consecutive = 0
         max_standard = max(_ROMAN_UNICODE_R.keys())
+        compound_over10 = (11, 12)
         while num > 0:
             if num < max_standard * (max_consecutive + 1):
                 for val, key in _ROMAN_UNICODE_R.items():
-                    if val and num - val >= 0 and val not in (11, 12):
+                    if val and num - val >= 0 and val not in compound_over10:
                         if key == last_key:
                             consecutive += 1
                         else:
@@ -180,61 +228,130 @@ def int2roman(
                             text = text[:-max_consecutive + 1] + prev_key
                             num -= val
                             break
-                    prev_key = key if val not in (11, 12) else prev_key
+                    prev_key = key if val not in compound_over10 else prev_key
             elif extended:
-                max_apostrophus = max(_ROMAN_APOSTROPHUS_R.values())
-                log_m = math.log10(_ROMAN_APOSTROPHUS['ↀ'])
+                # max_apostrophus = max(_ROMAN_APOSTROPHUS.values())
+                min_apostrophus = min(_ROMAN_APOSTROPHUS.values())
+                log_m = math.log10(min_apostrophus)
                 log_num = math.log10(num)
                 is_half = num >= 5 * 10 ** int(log_num)
                 repeat = int(log_num) - int(log_m) + (1 if is_half else 0)
-                tmp_num = (5 if is_half else 1) * 10 ** int(log_num)
-                correction = -2 * tmp_num \
-                    if num >= tmp_num * (max_consecutive + 1) else 0
-                if claudian:
-                    prefix = 'Ⅾ' if is_half else (
-                        'Ⅽ' * repeat + ('ↀ' if repeat else 'M'))
-                    text += prefix + 'Ↄ' * repeat
-                elif num < max_apostrophus * (max_consecutive + 1):
-                    text += _ROMAN_APOSTROPHUS[tmp_num]
-                else:
-                    raise ValueError(
-                        '`{}` needs `claudian` option'.format(num))
-                num -= tmp_num + correction
+                num_to_add = (5 if is_half else 1) * 10 ** int(log_num)
+                correction = -2 * num_to_add \
+                    if num >= num_to_add * (max_consecutive + 1) else 0
+                char_to_append = ('Ⅾ' if is_half else (
+                    'Ⅽ' * repeat + ('ↀ' if repeat else 'Ⅿ'))) + 'Ↄ' * repeat
+                if not claudian:
+                    char_to_append = multi_replace(
+                        char_to_append, _ROMAN_CLAUDIAN_TO_APOSTROPHUS)
+                text += char_to_append
+                num -= num_to_add + correction
             else:
                 raise ValueError('`{}` needs `extended` option'.format(num))
+    # ensure use of compact chars for 11 and 12
     text = multi_replace(text, (('ⅩⅠ', 'Ⅺ'), ('ⅩⅡ', 'Ⅻ')))
+    if only_additive:
+        text = multi_replace(text, (('Ⅳ', 'ⅡⅡ'), ('Ⅸ', 'ⅦⅡ')))
     if archaic:
         text = multi_replace(text, _ROMAN_ARCHAIC)
     if only_ascii:
         text = multi_replace(text, _ROMAN_UNICODE_TO_ASCII)
-    text = text.upper() if uppercase else text.lower()
+    if not uppercase:
+        text = multi_replace(text, _ROMAN_CLAUDIAN_TO_APOSTROPHUS_R).lower()
+    else:  # should not be necessary
+        text = text.upper()
     return text
 
 
 # ======================================================================
-def roman2int(text):
+def roman2int(text, strict=False, strict_regex=_ROMAN_STRICT_REGEX):
     """
+    Convert a string representation of a Roman number to integer.
 
     Args:
-        text ():
+        text (str): The input number to parse.
+        strict (bool): Only accept strictly formally valid Roman numbers.
+            The following is checked:
+            - repetition of identical symbols more than 3 times not allowed,
+              except for apostrophus notation.
+            - the symbols are sorted according decreasing value left-to-right,
+              except for the subtraction notation, which allow a single
+              symbol of next lower value to be placed on the left of a larger
+              value symbol (this is to avoid the necessity for repeating the
+              same symbol 4 times).
 
     Returns:
+        num (int): The integer represented.
 
+    Notes:
+        - Large numbers using the apostrophus notation cannot be parsed yet,
+          but if no apostrophus notation is used (and strict parsing is not set)
+          the parsing works.
 
     Examples:
-        >>> roman2int('MDCLXVI')
+        >>> [roman2int(s) for s in ['MDCLXVI', 'iv', 'Ⅵ', 'IC', 'IIM', 'VL']]
+        [1666, 4, 6, 99, 998, 45]
+        >>> invalid = 0
+        >>> for s in ['MDCLXVI', 'IC', 'IIM', 'VL', 'MDO', 'CCDCCDOCCDODOMDO']:
+        ...     try:
+        ...         roman2int(s, strict=True)
+        ...     except ValueError:
+        ...         invalid += 1
+        ...     except NotImplementedError:
+        ...         pass
         1666
+        >>> print('Invalid: {}'.format(invalid))
+        Invalid: 3
+        >>> roman2int('MMMMMM')
+        6000
+        >>> roman2int('MMMMMM', strict=True)
+        Traceback (most recent call last):
+            ....
+        ValueError: Formally invalid input `MMMMMM`
+        >>> [roman2int(s) for s in ['CCDO', 'DO']]
+        Traceback (most recent call last):
+            ....
+        NotImplementedError: Cannot parse large numbers yet!
+        >>> all([i == roman2int(int2roman(i)) for i in range(-3999, 4000, 7)])
+        True
+        >>> all([i == roman2int(int2roman(i)) for i in range(1666, 10000, 973)])
+        Traceback (most recent call last):
+            ....
+        NotImplementedError: Cannot parse large numbers yet!
     """
     num = None
     text = text.strip().upper()
+    if _ROMAN_MINUS in text and text[0] == _ROMAN_MINUS:
+        sign = -1
+        text = text[1:]
+    else:
+        sign = 1
     text = multi_replace(text, _ROMAN_UNICODE_TO_ASCII)
     text = multi_replace(text, tuple([(i, j) for (j, i) in _ROMAN_ARCHAIC]))
-    valid_chars = True
-    if valid_chars:
-        pass
+    valid_chars = set(''.join([a for u, a in _ROMAN_UNICODE_TO_ASCII]))
+    if set(text).issubset(valid_chars):
+        num = 0
+        if text != _ROMAN_ASCII_R[0]:
+            is_valid = re.match(strict_regex, text)
+            if _ROMAN_ASCII_R[0] in text:
+                raise ValueError(
+                    'Invalid: if `{}` in input, cannot contain else'.format(
+                        _ROMAN_ASCII_R[0]))
+            elif _ROMAN_CLAUDIAN_TO_ASCII in text:
+                raise NotImplementedError('Cannot parse large numbers yet!')
+            elif not strict or is_valid:
+                for i, char in enumerate(text):
+                    if i + 1 < len(text) and any(
+                            [_ROMAN_ASCII[tmp_char] > _ROMAN_ASCII[char]
+                             for tmp_char in text[i + 1:]]):
+                        num -= _ROMAN_ASCII[char]
+                    else:
+                        num += _ROMAN_ASCII[char]
+            else:
+                raise ValueError('Formally invalid input `{}`'.format(text))
     else:
         raise ValueError('Input contains invalid characters')
-    return num
+    return sign * num
 
 
 # ======================================================================
@@ -242,26 +359,30 @@ def int2letter(
         num,
         alphabet=string.ascii_lowercase):
     """
+    Convert a number to the least amount letters (within an alphabet).
+
+    Items in the alphabet must not repeat.
+
+    This is the inverse of `letter2int()` given the same alphabet.
 
     Args:
-        num ():
-        alphabet ():
+        num (int): The input number to convert.
+        alphabet (str): The alphabet to use for the representation.
+            Characters within the alphabet must not repeat.
 
     Returns:
+        text (str): The integer represented.
 
     Examples:
         >>> [int2letter(i) for i in range(14)]
         ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n']
-        >>> int2letter(23)
-        'x'
-        >>> int2letter(26)
-        'aa'
-        >>> int2letter(702)
-        'aaa'
-        >>> int2letter(1983)
-        'bxh'
+        >>> [int2letter(i) for i in [23, 26, 27, 28, 29, 702, 703, 704, 1983]]
+        ['x', 'aa', 'ab', 'ac', 'ad', 'aaa', 'aab', 'aac', 'bxh']
         >>> for n in range(100):
         ...     assert(n == letter2int(int2letter(n)))
+
+    See Also:
+        letter2int(), tokens2int(), int2tokens()
     """
     return int2tokens(num, alphabet)
 
@@ -271,18 +392,28 @@ def letter2int(
         text,
         alphabet=string.ascii_lowercase):
     """
+    Convert a group of letters (within a given alphabet) to a number.
+
+    Items in the alphabet must not repeat.
+
+    This is the inverse of `int2letter()` given the same alphabet.
 
     Args:
-        text ():
-        alphabet ():
+        text (str): The input string to parse.
+        alphabet (str): The alphabet to use for the representation.
+            Characters within the alphabet must not repeat.
 
     Returns:
+        num (int): The integer represented.
 
     Examples:
-        >>> [letter2int(s) for s in ['a', 'z', 'aa', 'aaa', 'aab', 'bxh']]
-        [0, 25, 26, 702, 703, 1983]
+        >>> [letter2int(s) for s in ['a', 'z', 'aa', 'ad', 'aaa', 'aab', 'bxh']]
+        [0, 25, 26, 29, 702, 703, 1983]
         >>> for n in range(100, 200):
         ...     assert(n == letter2int(int2letter(n)))
+
+    See Also:
+        int2letter(), tokens2int(), int2tokens()
     """
     num = 0
     for i, letter in enumerate(text[::-1]):
@@ -296,12 +427,19 @@ def int2tokens(
         num,
         tokens):
     """
+    Convert a group of tokens (within a given set) to a number.
+
+    Items in the tokens set must not repeat/overlap.
+
+    This is the inverse of `int2tokens()` given the same tokens set.
 
     Args:
-        num ():
-        tokens ():
+        num (int): The input number to convert.
+        tokens (iterable[str]): The tokens to use for the representation.
+            Items within the tokens set must not repeat or overlap.
 
     Returns:
+        text (str): The integer represented.
 
     Examples:
         >>> [int2tokens(i, ('0', '1')) for i in range(10)]
@@ -317,6 +455,9 @@ def int2tokens(
         >>> d = ('mo', 'no', 'ke')
         >>> for n in range(100):
         ...     assert(n == tokens2int(int2tokens(n, d), d))
+
+    See Also:
+        letter2int(), int2letter(), tokens2int()
     """
     text = ''
     while num >= 0:
@@ -330,12 +471,19 @@ def tokens2int(
         text,
         tokens):
     """
+    Convert a number to the least amount tokens (within a tokens set).
+
+    Items in the tokens set must not repeat/overlap.
+
+    This is the inverse of `tokens2int()` given the same tokens set.
 
     Args:
-        text ():
-        tokens ():
+        text (str): The input string to parse.
+        tokens (iterable[str]): The tokens to use for the representation.
+            Items within the tokens set must not repeat or overlap.
 
     Returns:
+        num (int): The integer represented.
 
     Examples:
         >>> [tokens2int(s, ('po', 'ta')) for s in ['po', 'ta', 'popo', 'pota']]
@@ -345,6 +493,9 @@ def tokens2int(
         >>> d = ('mo', 'no', 'ke')
         >>> for n in range(100, 200):
         ...     assert(n == tokens2int(int2tokens(n, d), d))
+
+    See Also:
+        letter2int(), int2letter(), int2tokens()
     """
     num = 0
     i = 0
