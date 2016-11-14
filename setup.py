@@ -49,14 +49,14 @@ def fix_version(
 
         version = setuptools_scm.get_version()
     with open(source_filepath, 'r') as src_file:
-        src_str = src_file.read()
+        src_str = src_file.read().decode('utf-8')
         src_str = re.sub(
             r"__version__ = '.*'",
             "__version__ = '{}'".format(version),
-            src_str)
+            src_str, flags=re.UNICODE)
 
     with open(source_filepath, 'w') as src_file:
-        src_file.write(src_str)
+        src_file.write(src_str.encode('utf-8'))
     return version
 
 
