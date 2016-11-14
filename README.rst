@@ -1,52 +1,60 @@
-hdu: Human-friendly summary of disk usage
-=========================================
+numeral: support for various integer-to-numeral (and back) conversion
+=====================================================================
 
-This software computes an estimate of the file disk usage for files and
-directories, similarly to the UNIX program 'du'.
-The result is then displayed to the console in a human friendly format.
+This Python library implements integer-to-numeral and numeral-to-integer
+conversion for a variety of numeral representations, including:
 
-It includes the following features:
+- alphabetic representation, i.e. a, b, c, d, ... for 0, 1, 2, 3, ...
+- Roman numbers, i.e. I, II, III, IV, ... for 0, 1, 2, 3, ...
+- generic tokens set representation, i.e. !, @, !!, !@, ... for 0, 1, 2, 3...
+  (given the tokens set {``!``, ``@``}).
 
-- a progress bar of each item for quick visual inspection
-- percentage information (precision can be set)
-- show the size of each item in the specified units
-- support for SI, IEC and UNIX ('du') units
-- maximum depth (of the displayed items) can be specified
-- optionally follow symlinks, mount points, special files and hidden files
-- can filter results to display only directories
-- can output results ending with '\\0' instead of newlines (useful for parsing)
-- can sort results by name or by size
+The generic tokens set representation uses the least number of tokens for
+representing a given integer, and uses an exponential-like notation similar to
+base-n conversion, except that the first symbol is used.
+The alphabetic representation is a special case of a generic tokens set
+representation, where the latin alphabet is used as tokens set.
+Upper/lower case conversion should be handled through Python built-ins.
+All representation support negative values.
+
+Detailed documentation is available for all functions through docstrings.
+
+Of note, the Roman numbers support include:
+
+- both **Unicode** and **ASCII-only** representations
+- partial support for large numbers via the so-called Apostrophus notation
+  (see: `<https://en.wikipedia.org/wiki/Roman_numerals#Apostrophus>`_)
+- additive-only or subtractive notations
+- toggleable forgiving/strict Roman number parsing
+- representation of zero
+  (see: `<https://en.wikipedia.org/wiki/Roman_numerals#Zero>`_)
+- negative numbers (with option to specify a custom negative sign)
+- partial support for archaic/late forms
+  (see: `<https://en.wikipedia.org/wiki/Numerals_in_Unicode#Roman_numerals>`_)
 
 Installation
 ------------
 The recommended way of installing the software is through
-`PyPI <https://pypi.python.org/pypi/hdu>`_:
+`PyPI <https://pypi.python.org/pypi/numeral>`_:
 
 .. code:: shell
 
-    $ pip install hdu
+    $ pip install numeral
 
-Alternatively, you can the clone the source repository from
-`Bitbucket <https://bitbucket.org/norok2/hdu>`_:
+Alternatively, you can clone the source repository from
+`Bitbucket <https://bitbucket.org/norok2/numeral>`_:
 
 .. code:: shell
 
-    $ mkdir hdu
-    $ cd hdu
-    $ git clone git@bitbucket.org:norok2/hdu.git
+    $ mkdir numeral
+    $ cd numeral
+    $ git clone git@bitbucket.org:norok2/numeral.git
     $ python setup.py install
 
-(last step may require additional permissions depending on your configuration)
+(some steps may require additional permissions depending on your configuration)
 
 The software does not have additional dependencies beyond Python and its
 standard library.
 
 It was tested with Python 2.7 and 3.5.
 Other version were not tested.
-
-Note
-----
-Although the software is ready, the packaging is still experimental.
-If you experience any issues, please consider reporting it.
-Suggestions and improvements are welcome!
-
