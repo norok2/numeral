@@ -26,7 +26,7 @@ from setuptools import find_packages
 cwd = os.path.realpath(os.path.dirname(__file__))
 
 # get the long description from the README file
-with open(os.path.join(cwd, 'README'), encoding='utf-8') as readme_file:
+with open(os.path.join(cwd, 'README.rst'), encoding='utf-8') as readme_file:
     long_description_text = readme_file.read()
 
 
