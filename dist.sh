@@ -7,7 +7,8 @@ MESSAGE="Distribute to PyPI."
 echo -e "\nVersioh History:"
 git tag
 NEW_VERSION=`git describe --abbrev=0 --tags`
-read -p " >> choose new version number [$NEW_VERSION]: " INPUT
+echo -e -n " >> choose new version number [$NEW_VERSION]: "
+read INPUT
 NEW_VERSION=${INPUT:-$NEW_VERSION}
 git commit -uno -a -m "$MESSAGE"
 git tag -f "$NEW_VERSION" -m "$MESSAGE"
@@ -34,7 +35,8 @@ if [ -z "$1" ]; then
     for FILE in *.${PYPIRC_EXT}; do
         CHOICE=${FILE%\.*}"|"$CHOICE
     done
-    read -p ">> choose target ["${CHOICE%?}"]: " PYPIRC
+    echo -e -n ">> choose target ["${CHOICE%?}"]: "
+    read PYPIRC
 else
     PYPIRC=$1
 fi
