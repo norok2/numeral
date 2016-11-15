@@ -65,7 +65,7 @@ if [ -z "$1" ]; then
 else
     PYPIRC=$1
 fi
-if [ -n $PYPIRC ]; then
+if [ -z $PYPIRC ]; then
     echo "HERE" ${PYPIRC}
     PYPIRC_FILE=${PYPIRC}.${PYPIRC_EXT}
 fi
@@ -95,6 +95,6 @@ if [ "$NUM_DISTS_FILES" -gt 1 ]; then
     fi
 fi
 
-if [ "$NUM_DISTS_FILES" -eq 1 ] || [ -n $DIST_ALL ] || [ $DIST_ALL != "yes" ]; then
+if [ "$NUM_DISTS_FILES" -eq 1 ] || [ -z $DIST_ALL ] || [ $DIST_ALL != "yes" ]; then
     twine_upload "${DISTS_FILES[${#DIST_FILES[@]} - 1]}"
 fi
