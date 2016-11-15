@@ -20,7 +20,7 @@ NEW_VERSION=${INPUT:-$NEW_VERSION}
 MESSAGE="Distribute to PyPI."
 echo -e -n "\n>> set commit and tag message [${MESSAGE}]: "
 read INPUT
-MESSAGE=${INPUT:-MESSAGE}
+MESSAGE=${INPUT:-"$MESSAGE"}
 
 subtitle "Update project"
 git commit -uno -a -m "$MESSAGE"

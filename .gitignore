@@ -5,7 +5,7 @@
 # create changelog from git
 # (being a dump of git commits, does not need to be tracked)
 CHANGELOG.*
-README.html
+
 
 # =====================================================================
 # :: C++
@@ -99,6 +99,8 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+docs/*.html
+docs/*.pdf
 
 # PyBuilder
 target/

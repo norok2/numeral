@@ -120,6 +120,210 @@ def multi_replace(
 
 
 # ======================================================================
+def int2letter(
+        num,
+        alphabet=string.ascii_lowercase,
+        negative_sign='-'):
+    """
+    Convert a number to the least amount letters (within an alphabet).
+
+    Items in the alphabet must not repeat.
+
+    This is the inverse of `letter2int()` given the same alphabet.
+
+    Args:
+        num (int): The input number to convert.
+        alphabet (str): The alphabet to use for the representation.
+            Characters within the alphabet must not repeat.
+        negative_sign (str): The symbol to use for negative numbers.
+            The negative sign will be the first character of the representation.
+
+    Returns:
+        text (str): The integer represented.
+
+    Examples:
+        >>> [int2letter(i) for i in range(14)]
+        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n']
+        >>> [int2letter(i) for i in [23, 26, 27, 28, 29, 702, 703, 704, 1983]]
+        ['x', 'aa', 'ab', 'ac', 'ad', 'aaa', 'aab', 'aac', 'bxh']
+        >>> all([n == letter2int(int2letter(n)) for n in range(-999, 99)])
+        True
+
+    See Also:
+        letter2int(), tokens2int(), int2tokens()
+    """
+    return int2tokens(num, alphabet, negative_sign)
+
+
+# ======================================================================
+def letter2int(
+        text,
+        alphabet=string.ascii_lowercase,
+        negative_sign='-'):
+    """
+    Convert a group of letters (within a given alphabet) to a number.
+
+    Items in the alphabet must not repeat.
+
+    This is the inverse of `int2letter()` given the same alphabet.
+
+    Args:
+        text (str): The input string to parse.
+        alphabet (str): The alphabet to use for the representation.
+            Characters within the alphabet must not repeat.
+        negative_sign (str): The symbol to use for negative numbers.
+            The negative sign must be the first character of the representation.
+
+    Returns:
+        num (int): The integer represented.
+
+    Raises:
+        ValueError: if text contains non-alphabet characters
+        ValueError: if `negative_sign` is in `alphabet`
+        ValueError: if `negative_sign` is present but not the first item
+
+    Examples:
+        >>> [letter2int(s) for s in ['a', 'z', 'aa', 'ad', 'aaa', 'aab', 'bxh']]
+        [0, 25, 26, 29, 702, 703, 1983]
+        >>> all([n == letter2int(int2letter(n)) for n in range(-99, 999)])
+        True
+
+    See Also:
+        int2letter(), tokens2int(), int2tokens()
+    """
+    num = 0
+    sign = 1
+    text = text.strip()
+    if negative_sign in alphabet:
+        raise ValueError('Alphabet and negative sign must not overlap')
+    if negative_sign in text:
+        if text[0] == negative_sign:
+            text = text[1:]
+            sign = -1
+        else:
+            raise ValueError('Negative sign is in wrong position')
+    if not set(text).issubset(set(alphabet)):
+        raise ValueError('Text contains invalid characters')
+    for i, letter in enumerate(text[::-1]):
+        offset = 0 if i == 0 else 1
+        num += (alphabet.index(letter) + offset) * len(alphabet) ** i
+    return num * sign
+
+
+# ======================================================================
+def int2tokens(
+        num,
+        tokens,
+        negative_sign='-'):
+    """
+    Convert a group of tokens (within a given set) to a number.
+
+    Items in the tokens set must not repeat/overlap.
+
+    This is the inverse of `int2tokens()` given the same tokens set.
+
+    Args:
+        num (int): The input number to convert.
+        tokens (iterable[str]): The tokens to use for the representation.
+            Items within the tokens set must not repeat or overlap.
+        negative_sign (str): The symbol to use for negative numbers.
+            The negative sign will be the first character of the representation.
+
+    Returns:
+        text (str): The integer represented.
+
+    Examples:
+        >>> [int2tokens(i, ('0', '1')) for i in range(10)]
+        ['0', '1', '00', '01', '10', '11', '000', '001', '010', '011']
+        >>> [int2tokens(i, ('a', 'b', 'c')) for i in range(10)]
+        ['a', 'b', 'c', 'aa', 'ab', 'ac', 'ba', 'bb', 'bc', 'ca']
+        >>> [int2tokens(i, 'abc') for i in range(10)]
+        ['a', 'b', 'c', 'aa', 'ab', 'ac', 'ba', 'bb', 'bc', 'ca']
+        >>> [int2tokens(i, ('po', 'ta')) for i in range(8)]
+        ['po', 'ta', 'popo', 'pota', 'tapo', 'tata', 'popopo', 'popota']
+        >>> int2tokens(161, ('po', 'ta'))
+        'potapopopotata'
+        >>> d = ('mo', 'no', 'ke')
+        >>> all([n == tokens2int(int2tokens(n, d), d) for n in range(-999, 99)])
+        True
+
+    See Also:
+        letter2int(), int2letter(), tokens2int()
+    """
+    text = ''
+    if num < 0:
+        sign_text = negative_sign
+        num = abs(num)
+    else:
+        sign_text = ''
+    while num >= 0:
+        text = tokens[num % len(tokens)] + text
+        num = num // len(tokens) - 1
+    return sign_text + text
+
+
+# ======================================================================
+def tokens2int(
+        text,
+        tokens,
+        negative_sign='-'):
+    """
+    Convert a number to the least amount tokens (within a tokens set).
+
+    Items in the tokens set must not repeat/overlap.
+
+    This is the inverse of `tokens2int()` given the same tokens set.
+
+    Args:
+        text (str): The input string to parse.
+        tokens (iterable[str]): The tokens to use for the representation.
+            Items within the tokens set must not repeat or overlap.
+        negative_sign (str): The symbol to use for negative numbers.
+            The negative sign must be the first character of the representation.
+
+    Returns:
+        num (int): The integer represented.
+
+    Examples:
+        >>> [tokens2int(s, ('po', 'ta')) for s in ['po', 'ta', 'popo', 'pota']]
+        [0, 1, 2, 3]
+        >>> tokens2int('potapopopotata', ('po', 'ta'))
+        161
+        >>> d = ('mo', 'no', 'ke')
+        >>> all([n == tokens2int(int2tokens(n, d), d) for n in range(-99, 999)])
+        True
+
+    See Also:
+        letter2int(), int2letter(), int2tokens()
+    """
+    num = 0
+    sign = 1
+    text = text.strip()
+    if negative_sign in tokens:
+        raise ValueError('Negative sign must not be a token')
+    if negative_sign in text:
+        if text[0] == negative_sign:
+            text = text[1:]
+            sign = -1
+        else:
+            raise ValueError('Negative sign is in wrong position')
+    if not set(text).issubset(set(''.join(tokens))):
+        raise ValueError('Text contains invalid characters')
+    i = 0
+    found = True
+    while text or not found:
+        found = False
+        for j, token in enumerate(tokens):
+            if text.endswith(token):
+                text = text[:-len(token)]
+                offset = 0 if i == 0 else 1
+                num += (j + offset) * len(tokens) ** i
+                found = True
+                i += 1
+    return num * sign
+
+
+# ======================================================================
 def int2roman(
         num,
         only_ascii=False,
@@ -370,210 +574,6 @@ def roman2int(
     else:
         raise ValueError('Input contains invalid characters')
     return sign * num
-
-
-# ======================================================================
-def int2letter(
-        num,
-        alphabet=string.ascii_lowercase,
-        negative_sign='-'):
-    """
-    Convert a number to the least amount letters (within an alphabet).
-
-    Items in the alphabet must not repeat.
-
-    This is the inverse of `letter2int()` given the same alphabet.
-
-    Args:
-        num (int): The input number to convert.
-        alphabet (str): The alphabet to use for the representation.
-            Characters within the alphabet must not repeat.
-        negative_sign (str): The symbol to use for negative numbers.
-            The negative sign will be the first character of the representation.
-
-    Returns:
-        text (str): The integer represented.
-
-    Examples:
-        >>> [int2letter(i) for i in range(14)]
-        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n']
-        >>> [int2letter(i) for i in [23, 26, 27, 28, 29, 702, 703, 704, 1983]]
-        ['x', 'aa', 'ab', 'ac', 'ad', 'aaa', 'aab', 'aac', 'bxh']
-        >>> all([n == letter2int(int2letter(n)) for n in range(-999, 99)])
-        True
-
-    See Also:
-        letter2int(), tokens2int(), int2tokens()
-    """
-    return int2tokens(num, alphabet, negative_sign)
-
-
-# ======================================================================
-def letter2int(
-        text,
-        alphabet=string.ascii_lowercase,
-        negative_sign='-'):
-    """
-    Convert a group of letters (within a given alphabet) to a number.
-
-    Items in the alphabet must not repeat.
-
-    This is the inverse of `int2letter()` given the same alphabet.
-
-    Args:
-        text (str): The input string to parse.
-        alphabet (str): The alphabet to use for the representation.
-            Characters within the alphabet must not repeat.
-        negative_sign (str): The symbol to use for negative numbers.
-            The negative sign must be the first character of the representation.
-
-    Returns:
-        num (int): The integer represented.
-
-    Raises:
-        ValueError: if text contains non-alphabet characters
-        ValueError: if `negative_sign` is in `alphabet`
-        ValueError: if `negative_sign` is present but not the first item
-
-    Examples:
-        >>> [letter2int(s) for s in ['a', 'z', 'aa', 'ad', 'aaa', 'aab', 'bxh']]
-        [0, 25, 26, 29, 702, 703, 1983]
-        >>> all([n == letter2int(int2letter(n)) for n in range(-99, 999)])
-        True
-
-    See Also:
-        int2letter(), tokens2int(), int2tokens()
-    """
-    num = 0
-    sign = 1
-    text = text.strip()
-    if negative_sign in alphabet:
-        raise ValueError('Alphabet and negative sign must not overlap')
-    if negative_sign in text:
-        if text[0] == negative_sign:
-            text = text[1:]
-            sign = -1
-        else:
-            raise ValueError('Negative sign is in wrong position')
-    if not set(text).issubset(set(alphabet)):
-        raise ValueError('Text contains invalid characters')
-    for i, letter in enumerate(text[::-1]):
-        offset = 0 if i == 0 else 1
-        num += (alphabet.index(letter) + offset) * len(alphabet) ** i
-    return num * sign
-
-
-# ======================================================================
-def int2tokens(
-        num,
-        tokens,
-        negative_sign='-'):
-    """
-    Convert a group of tokens (within a given set) to a number.
-
-    Items in the tokens set must not repeat/overlap.
-
-    This is the inverse of `int2tokens()` given the same tokens set.
-
-    Args:
-        num (int): The input number to convert.
-        tokens (iterable[str]): The tokens to use for the representation.
-            Items within the tokens set must not repeat or overlap.
-        negative_sign (str): The symbol to use for negative numbers.
-            The negative sign will be the first character of the representation.
-
-    Returns:
-        text (str): The integer represented.
-
-    Examples:
-        >>> [int2tokens(i, ('0', '1')) for i in range(10)]
-        ['0', '1', '00', '01', '10', '11', '000', '001', '010', '011']
-        >>> [int2tokens(i, ('a', 'b', 'c')) for i in range(10)]
-        ['a', 'b', 'c', 'aa', 'ab', 'ac', 'ba', 'bb', 'bc', 'ca']
-        >>> [int2tokens(i, 'abc') for i in range(10)]
-        ['a', 'b', 'c', 'aa', 'ab', 'ac', 'ba', 'bb', 'bc', 'ca']
-        >>> [int2tokens(i, ('po', 'ta')) for i in range(8)]
-        ['po', 'ta', 'popo', 'pota', 'tapo', 'tata', 'popopo', 'popota']
-        >>> int2tokens(161, ('po', 'ta'))
-        'potapopopotata'
-        >>> d = ('mo', 'no', 'ke')
-        >>> all([n == tokens2int(int2tokens(n, d), d) for n in range(-999, 99)])
-        True
-
-    See Also:
-        letter2int(), int2letter(), tokens2int()
-    """
-    text = ''
-    if num < 0:
-        sign_text = negative_sign
-        num = abs(num)
-    else:
-        sign_text = ''
-    while num >= 0:
-        text = tokens[num % len(tokens)] + text
-        num = num // len(tokens) - 1
-    return sign_text + text
-
-
-# ======================================================================
-def tokens2int(
-        text,
-        tokens,
-        negative_sign='-'):
-    """
-    Convert a number to the least amount tokens (within a tokens set).
-
-    Items in the tokens set must not repeat/overlap.
-
-    This is the inverse of `tokens2int()` given the same tokens set.
-
-    Args:
-        text (str): The input string to parse.
-        tokens (iterable[str]): The tokens to use for the representation.
-            Items within the tokens set must not repeat or overlap.
-        negative_sign (str): The symbol to use for negative numbers.
-            The negative sign must be the first character of the representation.
-
-    Returns:
-        num (int): The integer represented.
-
-    Examples:
-        >>> [tokens2int(s, ('po', 'ta')) for s in ['po', 'ta', 'popo', 'pota']]
-        [0, 1, 2, 3]
-        >>> tokens2int('potapopopotata', ('po', 'ta'))
-        161
-        >>> d = ('mo', 'no', 'ke')
-        >>> all([n == tokens2int(int2tokens(n, d), d) for n in range(-99, 999)])
-        True
-
-    See Also:
-        letter2int(), int2letter(), int2tokens()
-    """
-    num = 0
-    sign = 1
-    text = text.strip()
-    if negative_sign in tokens:
-        raise ValueError('Negative sign must not be a token')
-    if negative_sign in text:
-        if text[0] == negative_sign:
-            text = text[1:]
-            sign = -1
-        else:
-            raise ValueError('Negative sign is in wrong position')
-    if not set(text).issubset(set(''.join(tokens))):
-        raise ValueError('Text contains invalid characters')
-    i = 0
-    found = True
-    while text or not found:
-        found = False
-        for j, token in enumerate(tokens):
-            if text.endswith(token):
-                text = text[:-len(token)]
-                offset = 0 if i == 0 else 1
-                num += (j + offset) * len(tokens) ** i
-                found = True
-                i += 1
-    return num * sign
 
 
 # ======================================================================

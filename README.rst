@@ -32,6 +32,7 @@ Of note, the Roman numbers support include:
 - partial support for archaic/late forms
   (see: `<https://en.wikipedia.org/wiki/Numerals_in_Unicode#Roman_numerals>`_)
 
+
 Installation
 ------------
 The recommended way of installing the software is through
@@ -58,3 +59,75 @@ standard library.
 
 It was tested with Python 2.7 and 3.5.
 Other version were not tested.
+
+
+Usage
+-----
+
+The following functions are defined:
+
+int2letter
+~~~~~~~~~~
+Convert a number to the least amount letters (within an alphabet).
+
+.. code:: python
+
+    >>> int2letter(10)
+    'k'
+    >>> import string  # Common string operations
+    >>> int2letter(10, string.ascii_letters)  # using both lower and upper cases
+    'aW'
+
+letter2int
+~~~~~~~~~~
+Convert a group of letters (within a given alphabet) to a number.
+
+.. code:: python
+
+    >>> letter2int('aa')
+    26
+
+
+int2tokens
+~~~~~~~~~~
+Convert a number to the least amount tokens (within a tokens set).
+
+
+.. code:: python
+
+    >>> int2tokens(12, ('!', '@', '#', '$'))
+    '#!'
+
+
+tokens2int
+~~~~~~~~~~
+Convert a group of tokens (within a given set) to a number.
+
+.. code:: python
+
+    >>> tokens2int('#!', ('!', '@', '#', '$'))
+    12
+
+
+int2roman
+~~~~~~~~~
+Convert an integer to its corresponding Roman number representation.
+
+.. code:: python
+
+    >>> int2roman(1666)  # using dedicated unicode chars
+    'ⅯⅮⅭⅬⅩⅥ'
+    >>> int2roman(1666, only_ascii=True)  # using only ASCII
+    'MDCLXVI'
+
+
+roman2int
+~~~~~~~~~
+Convert a string representation of a Roman number to integer.
+
+.. code:: python
+
+    >>> int2roman('MDCLXVI')
+    1666
+
+
