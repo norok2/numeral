@@ -79,7 +79,7 @@ function twine_upload() {
 
 DISTS_FILES=(dist/*)
 NUM_DISTS_FILES=${#DISTS_FILES[@]}
-if [ "$NUM_PYPIRC_FILES" -gt "1" ]; then
+if [ "$NUM_DISTS_FILES" -gt "1" ]; then
     echo -e -n "\n>> Process all files [yes/NO]: "
     read INPUT
     DIST_ALL=${INPUT:-no}
