@@ -24,7 +24,8 @@ from setuptools import find_packages
 
 # ======================================================================
 # project specific variables
-VERSION_FILEPATH = 'numeral/_version.py'
+NAME = 'numeral'
+VERSION_FILEPATH = os.path.join(NAME.lower(), '_version.py')
 README_FILEPATH = 'README.rst'
 
 # get the working directory for the setup script
@@ -86,10 +87,9 @@ def fix_version(
 # ======================================================================
 # :: call the setup tool
 setup(
-    name='numeral',
+    name=NAME.lower(),
 
-    description='Support for various integer-to-numeral (and back) '
-                'conversion.',
+    description='Support for various integer-to-numeral conversion.',
     long_description=LONG_DESCRIPTION_TEXT,
 
     # use_scm_version=True,
