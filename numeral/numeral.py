@@ -20,7 +20,10 @@ import doctest  # Test interactive Python examples
 
 # ======================================================================
 # :: Version
-from numeral._version import __version__
+try:
+    from numeral._version import __version__
+except ImportError:
+    __version__ = '0.0.0.0'
 
 # ======================================================================
 # :: Project Details
