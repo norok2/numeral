@@ -62,7 +62,6 @@ if [ -n "$PYPIRC"  ]; then
     PYPIRC_FILE=${PYPIRC}.${PYPIRC_EXT}
 fi
 
-MASK="\.dev"
 for FILE in dist/*; do
     if [ -f ${FILE} ] && [ -f ${PYPIRC_FILE} ]; then
         echo -e "Uploading `${FILE}` ..."
