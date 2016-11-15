@@ -49,7 +49,7 @@ PYPIRC_EXT=pypirc
 PYPIRC_FILES=(*.$PYPIRC_EXT)
 NUM_PYPIRC_FILES=${#PYPIRC_FILES[@]}
 if [ -z "$1" ]; then
-    if [ "$NUM_PYPIRC_FILES" -gt 1 ]; then
+    if [ "$NUM_PYPIRC_FILES" -gt "1" ]; then
         for FILE in $PYPIRC_FILES; do
             CHOICE=${FILE%\.*}
             CHOICES=${CHOICE}"|"${CHOICES}
@@ -79,7 +79,7 @@ function twine_upload() {
 
 DISTS_FILES=(dist/*)
 NUM_DISTS_FILES=${#DISTS_FILES[@]}
-if [ "$NUM_PYPIRC_FILES" -gt 1 ]; then
+if [ "$NUM_PYPIRC_FILES" -gt "1" ]; then
     echo -e -n "\n>> Process all files [yes/NO]: "
     read INPUT
     DIST_ALL=${INPUT:-no}
@@ -90,6 +90,6 @@ if [ "$NUM_PYPIRC_FILES" -gt 1 ]; then
     fi
 fi
 
-if [ "$NUM_DISTS_FILES" -eq 1 ] || [ -n $DIST_ALL ] || [ $DIST_ALL -ne "yes" ]; then
+if [ "$NUM_DISTS_FILES" -eq "1" ] || [ -n $DIST_ALL ] || [ $DIST_ALL -ne "yes" ]; then
     twine_upload "${DISTS_FILES[${#DIST_FILES[@]} - 1]}"
 fi
