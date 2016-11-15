@@ -83,6 +83,8 @@ function twine_upload() {
 DISTS_FILES=(dist/*)
 NUM_DISTS_FILES=${#DISTS_FILES[@]}
 if [ "$NUM_DISTS_FILES" -gt 1 ]; then
+    subtitle "Available dist files"
+    echo -e "$DISTS_FILES"
     echo -e -n "\n>> Process all files [yes/NO]: "
     read INPUT
     DIST_ALL=${INPUT:-no}
