@@ -84,7 +84,7 @@ DISTS_FILES=(dist/*)
 NUM_DISTS_FILES=${#DISTS_FILES[@]}
 if [ "$NUM_DISTS_FILES" -gt 1 ]; then
     subtitle "Available dist files"
-    echo -e "${DISTS_FILES[*]}"
+    ( IFS=$'\n'; echo -e "${DISTS_FILES[*]}" )
     echo -e -n "\n>> Process only last file [YES/no] (otherwise, all files): "
     read INPUT
     ONLY_LAST=${INPUT:-yes}
