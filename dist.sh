@@ -84,17 +84,17 @@ DISTS_FILES=(dist/*)
 NUM_DISTS_FILES=${#DISTS_FILES[@]}
 if [ "$NUM_DISTS_FILES" -gt 1 ]; then
     subtitle "Available dist files"
-    echo -e "$DISTS_FILES"
-    echo -e -n "\n>> Process all files [yes/NO]: "
+    echo -e "${DISTS_FILES[*]}"
+    echo -e -n "\n>> Process only last file [YES/no] (otherwise, all files): "
     read INPUT
-    DIST_ALL=${INPUT:-no}
-    if [ "$DIST_ALL" = "yes" ]; then
+    ONLY_LAST=${INPUT:-yes}
+    if [ "$ONLY_LAST" = "no" ]; then
         for FILE in DISTS_FILES; do
             twine_upload "$FILE"
         done
     fi
 fi
 
-if [ "$NUM_DISTS_FILES" -eq 1 ] || [ -z $DIST_ALL ] || [ $DIST_ALL != "yes" ]; then
+if [ "$NUM_DISTS_FILES" -eq 1 ] || [ -z $ONLY_LAST ] || [ $ONLY_LAST = "yes" ]; then
     twine_upload "${DISTS_FILES[${#DIST_FILES[@]} - 1]}"
 fi
