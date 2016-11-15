@@ -3,7 +3,16 @@
 
 # ======================================================================
 echo -e "\n :: Update tag..."
-git commit -m
+MESSAGE="Distribute to PyPI."
+echo -e "\nVersioh History:"
+git tag
+NEW_VERSION=`git describe --abbrev=0 --tags`
+read -p " >> choose new version number [$NEW_VERSION]: " INPUT
+NEW_VERSION=${INPUT:-$NEW_VERSION}
+git commit -uno -a -m "$MESSAGE"
+git tag -f "$NEW_VERSION" -m "$MESSAGE"
+git push
+
 
 # ======================================================================
 echo -e "\n :: Create change log..."
@@ -25,8 +34,7 @@ if [ -z "$1" ]; then
     for FILE in *.${PYPIRC_EXT}; do
         CHOICE=${FILE%\.*}"|"$CHOICE
     done
-    echo -e -n "choose target ["${CHOICE%?}"]: "
-    read PYPIRC
+    read -p ">> choose target ["${CHOICE%?}"]: " PYPIRC
 else
     PYPIRC=$1
 fi
