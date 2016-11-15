@@ -39,22 +39,32 @@ python setup.py bdist_wheel --universal
 
 # ======================================================================
 echo -e "\n :: Distribute package..."
-PYPIRC=release
 PYPIRC_EXT=pypirc
+PYPIRC_FILES=*.${PYPIRC_EXT}
+NUM_PYPIRC_FILES=${#PYPIRC_FILES[@]}
 if [ -z "$1" ]; then
-    for FILE in *.${PYPIRC_EXT}; do
-        CHOICE=${FILE%\.*}"|"$CHOICE
-    done
-    echo -e -n "\n>> choose target ["${CHOICE%?}"]: "
-    read INPUT
-    PYPIRC=${INPUT:-$PYPIRC}
+    if [ "$NUM_PYPIRC_FILES" -gt 1 ]; then
+        for FILE in $PYPIRC_FILES; do
+            CHOICE=${FILE%\.*}
+            CHOICES=${CHOICE}"|"${CHOICES}
+        done
+        echo -e -n "\n>> available targets: ["${CHOICES%?}"]"
+        echo -e -n "\n>> choose target ["${CHOICE}"]: "
+        read INPUT
+        PYPIRC=${INPUT:-$CHOICE}
+    else
+        PYPIRC_FILE="${PYPIRC_FILES%.*}"
+    fi
 else
     PYPIRC=$1
 fi
-PYPIRC_FILE=${PYPIRC}.${PYPIRC_EXT}
+if [ -n "$PYPIRC"  ]; then
+    PYPIRC_FILE=${PYPIRC}.${PYPIRC_EXT}
+fi
 
+MASK="\.dev"
 for FILE in dist/*; do
-    if [ -f ${FILE} ] && [ -f ${PYPIRC_FILE} ]; then
+    if [[ ! $FILE =~ [^$MASK] ]] && [ -f ${FILE} ] && [ -f ${PYPIRC_FILE} ]; then
         twine upload ${FILE} --config-file ${PYPIRC_FILE}
     fi
 done
