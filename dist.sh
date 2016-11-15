@@ -46,7 +46,7 @@ python setup.py bdist_wheel --universal
 # ======================================================================
 title "Distribute package"
 PYPIRC_EXT=pypirc
-PYPIRC_FILES=(*.${PYPIRC_EXT})
+PYPIRC_FILES=(*.$PYPIRC_EXT)
 NUM_PYPIRC_FILES=${#PYPIRC_FILES[@]}
 if [ -z "$1" ]; then
     if [ "$NUM_PYPIRC_FILES" -gt 1 ]; then
@@ -64,15 +64,32 @@ if [ -z "$1" ]; then
 else
     PYPIRC=$1
 fi
-if [ -n "$PYPIRC"  ]; then
+if [ -n "$PYPIRC" ]; then
     PYPIRC_FILE=${PYPIRC}.${PYPIRC_EXT}
 fi
 
-for FILE in dist/*; do
-    if [ -f ${FILE} ] && [ -f ${PYPIRC_FILE} ]; then
-        subtitle "Uploading \`${FILE}\`"
-        twine upload ${FILE} --config-file ${PYPIRC_FILE}
+function twine_upload() {
+    if [ -f $1 ] && [ -f ${PYPIRC_FILE} ]; then
+        subtitle "Uploading \`$1\`"
+        twine upload --config-file ${PYPIRC_FILE}
     else
-        subtitle "Skipping \`${FILE}\`"
+        subtitle "Skipping \`$1\`"
     fi
-done
+}
+
+DISTS_FILES=(dist/*)
+NUM_DISTS_FILES=${#DISTS_FILES[@]}
+if [ "$NUM_PYPIRC_FILES" -gt 1 ]; then
+    echo -e -n "\n>> Process all files [yes/NO]: "
+    read INPUT
+    PROCESS_ALL=${INPUT:-no}
+    if [ "$PROCESS_ALL" -eq "yes" ]; then
+        for FILE in DISTS_FILES; do
+            twine_upload $FILE
+        done
+    fi
+fi
+
+if [ "$NUM_DISTS_FILES" -eq 1 ] || [ $PROCESS_ALL -ne "yes" ]; then
+    twine_upload "${DISTS_FILES[${#DIST_FILES[@]} - 1]}"
+fi
