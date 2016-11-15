@@ -64,7 +64,7 @@ if [ -z "$1" ]; then
 else
     PYPIRC=$1
 fi
-if [ -n "$PYPIRC" ]; then
+if [ -n $PYPIRC ]; then
     PYPIRC_FILE=${PYPIRC}.${PYPIRC_EXT}
 fi
 
@@ -82,14 +82,14 @@ NUM_DISTS_FILES=${#DISTS_FILES[@]}
 if [ "$NUM_PYPIRC_FILES" -gt 1 ]; then
     echo -e -n "\n>> Process all files [yes/NO]: "
     read INPUT
-    PROCESS_ALL=${INPUT:-no}
-    if [ "$PROCESS_ALL" -eq "yes" ]; then
+    DIST_ALL=${INPUT:-no}
+    if [ "$DIST_ALL" -eq "yes" ]; then
         for FILE in DISTS_FILES; do
             twine_upload $FILE
         done
     fi
 fi
 
-if [ "$NUM_DISTS_FILES" -eq 1 ] || [ $PROCESS_ALL -ne "yes" ]; then
+if [ "$NUM_DISTS_FILES" -eq 1 ] || [ -n $DIST_ALL ] || [ $DIST_ALL -ne "yes" ]; then
     twine_upload "${DISTS_FILES[${#DIST_FILES[@]} - 1]}"
 fi
