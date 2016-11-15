@@ -94,7 +94,7 @@ ROMAN_ALTERNATIVES = (('Ⅵ', 'ↅ'), ('Ⅼ', 'ↆ'), ('Ⅿ', 'ↀ'))
 
 
 # ======================================================================
-def multi_replace(
+def _multi_replace(
         text,
         replaces):
     """
@@ -109,11 +109,11 @@ def multi_replace(
         text (str): The string after the performed replacements.
 
     Examples:
-        >>> multi_replace('python.best', (('thon', 'mrt'), ('est', 'ase')))
+        >>> _multi_replace('python.best', (('thon', 'mrt'), ('est', 'ase')))
         'pymrt.base'
-        >>> multi_replace('x-x-x-x', (('x', 'est'), ('est', 'test')))
+        >>> _multi_replace('x-x-x-x', (('x', 'est'), ('est', 'test')))
         'test-test-test-test'
-        >>> multi_replace('x-x-', (('-x-', '.test'),))
+        >>> _multi_replace('x-x-', (('-x-', '.test'),))
         'x.test'
     """
     return functools.reduce(lambda s, r: s.replace(*r), replaces, text)
@@ -455,22 +455,22 @@ def int2roman(
                 char_to_append = ('Ⅾ' if is_half else (
                     'Ⅽ' * repeat + ('ↀ' if repeat else 'Ⅿ'))) + 'Ↄ' * repeat
                 if not claudian:
-                    char_to_append = multi_replace(
+                    char_to_append = _multi_replace(
                         char_to_append, _ROMAN_CLAUDIAN_TO_APOSTROPHUS)
                 text += char_to_append
                 num -= num_to_add + correction
             else:
                 raise ValueError('`{}` needs `extended` option'.format(num))
     # ensure use of compact chars for 11 and 12
-    text = multi_replace(text, (('ⅩⅠ', 'Ⅺ'), ('ⅩⅡ', 'Ⅻ')))
+    text = _multi_replace(text, (('ⅩⅠ', 'Ⅺ'), ('ⅩⅡ', 'Ⅻ')))
     if only_additive:
-        text = multi_replace(text, (('Ⅳ', 'ⅡⅡ'), ('Ⅸ', 'ⅦⅡ')))
+        text = _multi_replace(text, (('Ⅳ', 'ⅡⅡ'), ('Ⅸ', 'ⅦⅡ')))
     if alternatives:
-        text = multi_replace(text, alternatives)
+        text = _multi_replace(text, alternatives)
     if only_ascii:
-        text = multi_replace(text, _ROMAN_UNICODE_TO_ASCII)
+        text = _multi_replace(text, _ROMAN_UNICODE_TO_ASCII)
     if not uppercase:
-        text = multi_replace(text, _ROMAN_CLAUDIAN_TO_APOSTROPHUS_R).lower()
+        text = _multi_replace(text, _ROMAN_CLAUDIAN_TO_APOSTROPHUS_R).lower()
     else:  # should not be necessary
         text = text.upper()
     return text
@@ -489,6 +489,7 @@ def roman2int(
         text (str): The input number to parse.
         strict (bool): Only accept strictly formally valid Roman numbers.
             The following is checked:
+
             - repetition of identical symbols more than 3 times not allowed,
               except for apostrophus notation.
             - the symbols are sorted according decreasing value left-to-right,
@@ -548,8 +549,8 @@ def roman2int(
         text = text[1:]
     else:
         sign = 1
-    text = multi_replace(text, _ROMAN_UNICODE_TO_ASCII)
-    text = multi_replace(text, tuple([(i, j) for (j, i) in ROMAN_ALTERNATIVES]))
+    text = _multi_replace(text, _ROMAN_UNICODE_TO_ASCII)
+    text = _multi_replace(text, tuple([(i, j) for (j, i) in ROMAN_ALTERNATIVES]))
     valid_chars = set(''.join([a for u, a in _ROMAN_UNICODE_TO_ASCII]))
     if set(text).issubset(valid_chars):
         num = 0

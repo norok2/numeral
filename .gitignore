@@ -99,6 +99,7 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+docs/_autosummary
 docs/*.html
 docs/*.pdf
 
