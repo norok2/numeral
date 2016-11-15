@@ -65,7 +65,7 @@ if [ -z "$1" ]; then
 else
     PYPIRC=$1
 fi
-if [ -z $PYPIRC ]; then
+if [ -z ${PYPIRC} ]; then
     echo "HERE" ${PYPIRC}
     PYPIRC_FILE=${PYPIRC}.${PYPIRC_EXT}
 fi
