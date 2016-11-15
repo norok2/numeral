@@ -70,10 +70,10 @@ fi
 
 function twine_upload() {
     echo -e $1
-    echo -e ${PYPIRC_FILE}
+    echo -e $PYPIRC_FILE
     if [ -f $1 ] && [ -f ${PYPIRC_FILE} ]; then
         subtitle "Uploading \`$1\`"
-        twine upload --config-file "${PYPIRC_FILE}" "$1"
+        twine upload --config-file "$PYPIRC_FILE" "$1"
     else
         subtitle "Skipping \`$1\`"
     fi
