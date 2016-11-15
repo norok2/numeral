@@ -13,12 +13,12 @@ subtitle "Project Status"
 git status
 
 NEW_VERSION=`git describe --abbrev=0 --tags`
-echo -e -n "\n>> choose new version number [$NEW_VERSION]: "
+echo -e -n "\n>> choose new version number [${NEW_VERSION}]: "
 read INPUT
 NEW_VERSION=${INPUT:-$NEW_VERSION}
 
 MESSAGE="Distribute to PyPI."
-echo -e -n "\n>> set commit and tag message [$MESSAGE]: "
+echo -e -n "\n>> set commit and tag message [${MESSAGE}]: "
 read INPUT
 MESSAGE=${INPUT:-MESSAGE}
 
@@ -50,7 +50,7 @@ PYPIRC_FILES=(*.$PYPIRC_EXT)
 NUM_PYPIRC_FILES=${#PYPIRC_FILES[@]}
 if [ -z "$1" ]; then
     if [ "$NUM_PYPIRC_FILES" -gt "1" ]; then
-        for FILE in $PYPIRC_FILES; do
+        for FILE in ${PYPIRC_FILES}; do
             CHOICE=${FILE%\.*}
             CHOICES=${CHOICE}"|"${CHOICES}
         done
@@ -64,11 +64,13 @@ if [ -z "$1" ]; then
 else
     PYPIRC=$1
 fi
-if [ -n $PYPIRC ]; then
+if [ -n ${PYPIRC} ]; then
     PYPIRC_FILE="${PYPIRC}".${PYPIRC_EXT}
 fi
 
 function twine_upload() {
+    echo -e $1
+    echo -e ${PYPIRC_FILE}
     if [ -f $1 ] && [ -f ${PYPIRC_FILE} ]; then
         subtitle "Uploading \`$1\`"
         twine upload --config-file "${PYPIRC_FILE}" "$1"
@@ -83,13 +85,13 @@ if [ "$NUM_DISTS_FILES" -gt "1" ]; then
     echo -e -n "\n>> Process all files [yes/NO]: "
     read INPUT
     DIST_ALL=${INPUT:-no}
-    if [ "$DIST_ALL" -eq "yes" ]; then
+    if [ "$DIST_ALL" = "yes" ]; then
         for FILE in DISTS_FILES; do
-            twine_upload $FILE
+            twine_upload "$FILE"
         done
     fi
 fi
 
-if [ "$NUM_DISTS_FILES" -eq "1" ] || [ -n $DIST_ALL ] || [ $DIST_ALL -ne "yes" ]; then
+if [ "$NUM_DISTS_FILES" -eq "1" ] || [ -n $DIST_ALL ] || [ $DIST_ALL != "yes" ]; then
     twine_upload "${DISTS_FILES[${#DIST_FILES[@]} - 1]}"
 fi
