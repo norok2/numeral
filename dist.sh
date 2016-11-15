@@ -30,13 +30,15 @@ python setup.py bdist_wheel --universal
 
 # ======================================================================
 echo -e "\n :: Distribute package..."
+PYPIRC=release
 PYPIRC_EXT=pypirc
 if [ -z "$1" ]; then
     for FILE in *.${PYPIRC_EXT}; do
         CHOICE=${FILE%\.*}"|"$CHOICE
     done
     echo -e -n ">> choose target ["${CHOICE%?}"]: "
-    read PYPIRC
+    read INPUT
+    PYPIRC=${INPUT:-$PYPIRC}
 else
     PYPIRC=$1
 fi
