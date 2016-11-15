@@ -30,7 +30,6 @@ git push
 
 # ======================================================================
 title "Create change log"
-echo -e ""
 CHANGELOG=CHANGELOG.txt
 echo -e "Change Log\n==========\n" > ${CHANGELOG}
 git log --oneline --decorate --graph >> ${CHANGELOG}
@@ -39,7 +38,6 @@ echo -e "${CHANGELOG} successfully created."
 
 # ======================================================================
 title "Create package"
-echo -e ""
 python setup.py bdist_wheel --universal
 
 
