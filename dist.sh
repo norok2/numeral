@@ -65,13 +65,13 @@ else
     PYPIRC=$1
 fi
 if [ -n $PYPIRC ]; then
-    PYPIRC_FILE=${PYPIRC}.${PYPIRC_EXT}
+    PYPIRC_FILE="${PYPIRC}".${PYPIRC_EXT}
 fi
 
 function twine_upload() {
     if [ -f $1 ] && [ -f ${PYPIRC_FILE} ]; then
         subtitle "Uploading \`$1\`"
-        twine upload --config-file ${PYPIRC_FILE}
+        twine upload --config-file "${PYPIRC_FILE}" "$1"
     else
         subtitle "Skipping \`$1\`"
     fi
