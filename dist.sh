@@ -4,7 +4,7 @@
 # ======================================================================
 echo -e "\n :: Update tag..."
 MESSAGE="Distribute to PyPI."
-echo -e "\nVersioh History:"
+echo -e "\nTag History:"
 git tag
 NEW_VERSION=`git describe --abbrev=0 --tags`
 echo -e -n " >> choose new version number [$NEW_VERSION]: "
