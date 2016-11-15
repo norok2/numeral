@@ -65,7 +65,7 @@ else
     PYPIRC=$1
 fi
 if [ -n ${PYPIRC} ]; then
-    PYPIRC_FILE="${PYPIRC}".${PYPIRC_EXT}
+    PYPIRC_FILE="$PYPIRC".${PYPIRC_EXT}
 fi
 
 function twine_upload() {
