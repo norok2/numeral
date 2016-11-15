@@ -146,10 +146,4 @@ setup(
         'blessed': 'blessed',
         'blessings': 'blessings',
     },
-
-    entry_points={
-        'console_scripts': [
-            'numeral=numeral.numeral:main',
-        ],
-    },
 )
