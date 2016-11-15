@@ -67,5 +67,7 @@ for FILE in dist/*; do
     if [[ ! $FILE =~ [^$MASK] ]] && [ -f ${FILE} ] && [ -f ${PYPIRC_FILE} ]; then
         echo -e "Uploading `${FILE}` ..."
         twine upload ${FILE} --config-file ${PYPIRC_FILE}
+    else
+        echo -e "Skipping `${FILE}`"
     fi
 done
