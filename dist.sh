@@ -67,6 +67,7 @@ fi
 if [ -n ${PYPIRC} ]; then
     PYPIRC_FILE=${PYPIRC}.${PYPIRC_EXT}
 fi
+echo -n $PYPIRC_FILE
 
 function twine_upload() {
     echo -e $1
