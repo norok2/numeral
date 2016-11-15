@@ -40,7 +40,7 @@ python setup.py bdist_wheel --universal
 # ======================================================================
 echo -e "\n :: Distribute package..."
 PYPIRC_EXT=pypirc
-PYPIRC_FILES=*.${PYPIRC_EXT}
+PYPIRC_FILES=(*.${PYPIRC_EXT})
 NUM_PYPIRC_FILES=${#PYPIRC_FILES[@]}
 if [ -z "$1" ]; then
     if [ "$NUM_PYPIRC_FILES" -gt 1 ]; then
@@ -53,7 +53,7 @@ if [ -z "$1" ]; then
         read INPUT
         PYPIRC=${INPUT:-$CHOICE}
     else
-        PYPIRC_FILE="${PYPIRC_FILES%.*}"
+        PYPIRC_FILE="${PYPIRC_FILES[0]}"
     fi
 else
     PYPIRC=$1
