@@ -59,12 +59,14 @@ if [ -z "$1" ]; then
         read INPUT
         PYPIRC=${INPUT:-$CHOICE}
     else
+        echo "THERE"
         PYPIRC_FILE="${PYPIRC_FILES[0]}"
     fi
 else
     PYPIRC=$1
 fi
 if [ -n ${PYPIRC} ]; then
+    echo "HERE"
     PYPIRC_FILE=${PYPIRC}.${PYPIRC_EXT}
 fi
 echo -n $PYPIRC_FILE
