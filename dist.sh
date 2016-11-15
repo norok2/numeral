@@ -68,6 +68,6 @@ for FILE in dist/*; do
         echo -e "Uploading `${FILE}` ..."
         twine upload ${FILE} --config-file ${PYPIRC_FILE}
     else
-        echo -e "Skipping `${FILE}`"
+        echo -e "Skipping \`${FILE}\`"
     fi
 done
