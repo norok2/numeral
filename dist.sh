@@ -85,7 +85,7 @@ if [ "$NUM_DISTS_FILES" -gt 1 ]; then
     read INPUT
     ONLY_LAST=${INPUT:-yes}
     if [ "$ONLY_LAST" = "no" ]; then
-        for FILE in DISTS_FILES; do
+        for FILE in ${DISTS_FILES}; do
             twine_upload "$FILE"
         done
     fi
