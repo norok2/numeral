@@ -98,10 +98,10 @@ coverage.xml
 *.log
 
 # Sphinx documentation
-docs/_build/
-docs/_autosummary
-docs/*.html
-docs/*.pdf
+doc/_build/
+doc/_autosummary
+doc/*.html
+doc/*.pdf
 
 # PyBuilder
 target/

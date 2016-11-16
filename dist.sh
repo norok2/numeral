@@ -25,7 +25,7 @@ MESSAGE=${INPUT:-"$MESSAGE"}
 subtitle "Update project"
 git commit -uno -a -m "$MESSAGE"
 git tag -f "$NEW_VERSION" -m "$MESSAGE"
-git push
+git push --prune --tags
 
 
 # ======================================================================

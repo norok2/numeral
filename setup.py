@@ -141,9 +141,4 @@ setup(
         'setuptools',
         'setuptools_scm'
     ],
-
-    extras_require={
-        'blessed': 'blessed',
-        'blessings': 'blessings',
-    },
 )
