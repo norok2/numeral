@@ -224,7 +224,7 @@ def int2tokens(
 
     Args:
         num (int): The input number to convert.
-        tokens (iterable[str]): The tokens to use for the representation.
+        tokens (Iterable[str]): The tokens to use for the representation.
             Items within the tokens set must not repeat or overlap.
         negative_sign (str): The symbol to use for negative numbers.
             The negative sign will be the first character of the representation.
@@ -276,7 +276,7 @@ def tokens2int(
 
     Args:
         text (str): The input string to parse.
-        tokens (iterable[str]): The tokens to use for the representation.
+        tokens (Iterable[str]): The tokens to use for the representation.
             Items within the tokens set must not repeat or overlap.
         negative_sign (str): The symbol to use for negative numbers.
             The negative sign must be the first character of the representation.
@@ -355,7 +355,7 @@ def int2roman(
         uppercase (bool): Use uppercase for the output.
             If False, the output is converted to lowercase.
         claudian (bool): Force the use of Claudian for apostrophus notation.
-        alternatives (iterable[iterable[str]]): Use alternate symbols.
+        alternatives (Iterable[Iterable[str]]): Use alternate symbols.
             Mostly useful in conjunction with ROMAN_ALTERNATIVES
         signed (bool): Accept negative numbers.
             The minus symbol is then prepended to string for negative numbers.
