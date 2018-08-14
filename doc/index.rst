@@ -3,24 +3,33 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-numeral
-=======
+Numeral -- support for various integer-to-numeral (and back) conversion
+=======================================================================
 
-support for various integer-to-numeral (and back) conversion
 
-Contents:
+Introduction and License
+------------------------
 
 .. toctree::
    :maxdepth: 2
+
+   readme_link
+   license_link
+
+
+Reference Manual
+----------------
 
 .. autosummary::
    :toctree: _autosummary
 
    numeral
 
+(This is automatically generated from the docstrings.)
+
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
