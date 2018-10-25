@@ -389,7 +389,7 @@ def int2roman(
         ['ⅡⅡ', 'ⅩⅩⅩⅩⅦⅡ', 'ⅮⅭⅭⅭⅭⅩⅩⅩⅩⅦⅡ', 'ↁⅯⅯⅯⅯⅭⅭⅭⅭⅬⅩⅩⅩⅩⅡⅡ']
         >>> [int2roman(i, extended=False) for i in range(3995, 4001)]
         Traceback (most recent call last):
-            ....
+            ...
         ValueError: `4000` needs `extended` option
         >>> [int2roman(i, uppercase=False) for i in range(1666, 5000, 631)]
         ['ⅿⅾⅽⅼⅹⅵ', 'ⅿⅿⅽⅽⅼⅹⅼⅶ', 'ⅿⅿⅾⅽⅾⅹⅹⅷ', 'ⅿⅿⅿⅾⅼⅸ', 'ⅿⅾↄⅽⅼⅹⅼ', 'ⅿⅾↄⅾⅽⅽⅽⅹⅺ']
@@ -400,7 +400,7 @@ def int2roman(
         ['ↅ', 'ↆ', 'ↀ', 'ↆↅ', 'ↀↅ', 'ↀↆ', 'ↀↆↅ', 'ↀↆⅦ']
         >>> [int2roman(i, signed=False) for i in [1666, -1666]]
         Traceback (most recent call last):
-            ....
+            ...
         ValueError: `-1666` needs `signed` option
     """
     text = ''
@@ -529,17 +529,17 @@ def roman2int(
         6000
         >>> roman2int('MMMMMM', strict=True)
         Traceback (most recent call last):
-            ....
+            ...
         ValueError: Formally invalid input `MMMMMM`
         >>> [roman2int(s) for s in ['CCDO', 'DO']]
         Traceback (most recent call last):
-            ....
+            ...
         NotImplementedError: Cannot parse large numbers yet!
         >>> all([i == roman2int(int2roman(i)) for i in range(-3999, 4000, 7)])
         True
         >>> all([i == roman2int(int2roman(i)) for i in range(1666, 10000, 973)])
         Traceback (most recent call last):
-            ....
+            ...
         NotImplementedError: Cannot parse large numbers yet!
     """
     num = None
