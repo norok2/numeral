@@ -102,7 +102,7 @@ def _multi_replace(
 
     Args:
         text (str): The input string.
-        replaces (tuple[str,str]): The listing of the replacements.
+        replaces (Sequence[Sequence[str]]): The listing of the replacements.
             Format: ((<old>, <new>), ...).
 
     Returns:
@@ -136,7 +136,8 @@ def int2letter(
         alphabet (str): The alphabet to use for the representation.
             Characters within the alphabet must not repeat.
         negative_sign (str): The symbol to use for negative numbers.
-            The negative sign will be the first character of the representation.
+            The negative sign will be the first character of the
+            representation.
 
     Returns:
         text (str): The integer represented.
@@ -172,7 +173,8 @@ def letter2int(
         alphabet (str): The alphabet to use for the representation.
             Characters within the alphabet must not repeat.
         negative_sign (str): The symbol to use for negative numbers.
-            The negative sign must be the first character of the representation.
+            The negative sign must be the first character of the
+            representation.
 
     Returns:
         num (int): The integer represented.
@@ -183,7 +185,8 @@ def letter2int(
         ValueError: if `negative_sign` is present but not the first item
 
     Examples:
-        >>> [letter2int(s) for s in ['a', 'z', 'aa', 'ad', 'aaa', 'aab', 'bxh']]
+        >>> [letter2int(s)
+        ...     for s in ['a', 'z', 'aa', 'ad', 'aaa', 'aab', 'bxh']]
         [0, 25, 26, 29, 702, 703, 1983]
         >>> all([n == letter2int(int2letter(n)) for n in range(-99, 999)])
         True
@@ -227,7 +230,8 @@ def int2tokens(
         tokens (Iterable[str]): The tokens to use for the representation.
             Items within the tokens set must not repeat or overlap.
         negative_sign (str): The symbol to use for negative numbers.
-            The negative sign will be the first character of the representation.
+            The negative sign will be the first character of the
+            representation.
 
     Returns:
         text (str): The integer represented.
@@ -244,7 +248,8 @@ def int2tokens(
         >>> int2tokens(161, ('po', 'ta'))
         'potapopopotata'
         >>> d = ('mo', 'no', 'ke')
-        >>> all([n == tokens2int(int2tokens(n, d), d) for n in range(-999, 99)])
+        >>> all([
+        ...     n == tokens2int(int2tokens(n, d), d) for n in range(-999, 99)])
         True
 
     See Also:
@@ -279,7 +284,8 @@ def tokens2int(
         tokens (Iterable[str]): The tokens to use for the representation.
             Items within the tokens set must not repeat or overlap.
         negative_sign (str): The symbol to use for negative numbers.
-            The negative sign must be the first character of the representation.
+            The negative sign must be the first character of the
+            representation.
 
     Returns:
         num (int): The integer represented.
@@ -290,7 +296,8 @@ def tokens2int(
         >>> tokens2int('potapopopotata', ('po', 'ta'))
         161
         >>> d = ('mo', 'no', 'ke')
-        >>> all([n == tokens2int(int2tokens(n, d), d) for n in range(-99, 999)])
+        >>> all([
+        ...     n == tokens2int(int2tokens(n, d), d) for n in range(-99, 999)])
         True
 
     See Also:
@@ -345,10 +352,11 @@ def int2roman(
             symbol (a specular C), which is in turn converted to a valid ASCII
             character with some resemblance to it, i.e. the letter `O`.
         only_additive (bool): Force only-additive notation.
-            This means that the symbols are strictly sorted according decreasing
-            value left-to-right and they all add up.
-            Otherwise, a single lower-value symbol preceding a larger-value one
-            is used to indicate subtraction, thus avoiding 4 symbols repetition.
+            This means that the symbols are strictly sorted according
+            decreasing value left-to-right and they all add up.
+            Otherwise, a single lower-value symbol preceding a larger-value
+            one is used to indicate subtraction, thus avoiding 4 symbols
+            repetition.
         extended (bool): Allow for 0 and large numbers to be included.
             Large numbers are above 3999 if `only_additive` is False,
             otherwise they are above 4999.
@@ -361,7 +369,8 @@ def int2roman(
             The minus symbol is then prepended to string for negative numbers.
             No symbol is added for positive numbers.
         negative_sign (str): The symbol to use for negative numbers.
-            The negative sign will be the first character of the representation.
+            The negative sign will be the first character of the
+            representation.
 
     Returns:
         text (str): The converted Roman number.
@@ -501,15 +510,16 @@ def roman2int(
             This must be a valid expression accepted by Python's `re.match()`.
             If `strict` is False, this parameter is ignored.
         negative_sign (str): The symbol to use for negative numbers.
-            The negative sign must be the first character of the representation.
+            The negative sign must be the first character of the
+            representation.
 
     Returns:
         num (int): The integer represented.
 
     Notes:
         - Large numbers using the apostrophus notation cannot be parsed yet,
-          but if no apostrophus notation is used (and strict parsing is not set)
-          the parsing works.
+          but if no apostrophus notation is used (and strict parsing is not
+          set) the parsing works.
 
     Examples:
         >>> [roman2int(s) for s in ['MDCLXVI', 'iv', 'Ⅵ', 'IC', 'IIM', 'VL']]
@@ -537,12 +547,12 @@ def roman2int(
         NotImplementedError: Cannot parse large numbers yet!
         >>> all([i == roman2int(int2roman(i)) for i in range(-3999, 4000, 7)])
         True
-        >>> all([i == roman2int(int2roman(i)) for i in range(1666, 10000, 973)])
+        >>> all([
+        ...     i == roman2int(int2roman(i)) for i in range(1666, 10000, 973)])
         Traceback (most recent call last):
             ...
         NotImplementedError: Cannot parse large numbers yet!
     """
-    num = None
     text = text.strip().upper()
     if negative_sign in text and text[0] == negative_sign:
         sign = -1
@@ -550,7 +560,7 @@ def roman2int(
     else:
         sign = 1
     text = _multi_replace(text, _ROMAN_UNICODE_TO_ASCII)
-    text = _multi_replace(text, tuple([(i, j) for (j, i) in ROMAN_ALTERNATIVES]))
+    text = _multi_replace(text, tuple([(i, j) for j, i in ROMAN_ALTERNATIVES]))
     valid_chars = set(''.join([a for u, a in _ROMAN_UNICODE_TO_ASCII]))
     if set(text).issubset(valid_chars):
         num = 0
