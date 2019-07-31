@@ -147,7 +147,7 @@ def int2letter(
         ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n']
         >>> [int2letter(i) for i in [23, 26, 27, 28, 29, 702, 703, 704, 1983]]
         ['x', 'aa', 'ab', 'ac', 'ad', 'aaa', 'aab', 'aac', 'bxh']
-        >>> all([n == letter2int(int2letter(n)) for n in range(-999, 99)])
+        >>> all(n == letter2int(int2letter(n)) for n in range(-999, 99))
         True
 
     See Also:
@@ -188,7 +188,7 @@ def letter2int(
         >>> [letter2int(s)
         ...     for s in ['a', 'z', 'aa', 'ad', 'aaa', 'aab', 'bxh']]
         [0, 25, 26, 29, 702, 703, 1983]
-        >>> all([n == letter2int(int2letter(n)) for n in range(-99, 999)])
+        >>> all(n == letter2int(int2letter(n)) for n in range(-99, 999))
         True
 
     See Also:
@@ -248,8 +248,7 @@ def int2tokens(
         >>> int2tokens(161, ('po', 'ta'))
         'potapopopotata'
         >>> d = ('mo', 'no', 'ke')
-        >>> all([
-        ...     n == tokens2int(int2tokens(n, d), d) for n in range(-999, 99)])
+        >>> all(n == tokens2int(int2tokens(n, d), d) for n in range(-999, 99))
         True
 
     See Also:
@@ -296,8 +295,7 @@ def tokens2int(
         >>> tokens2int('potapopopotata', ('po', 'ta'))
         161
         >>> d = ('mo', 'no', 'ke')
-        >>> all([
-        ...     n == tokens2int(int2tokens(n, d), d) for n in range(-99, 999)])
+        >>> all(n == tokens2int(int2tokens(n, d), d) for n in range(-99, 999))
         True
 
     See Also:
@@ -545,10 +543,9 @@ def roman2int(
         Traceback (most recent call last):
             ...
         NotImplementedError: Cannot parse large numbers yet!
-        >>> all([i == roman2int(int2roman(i)) for i in range(-3999, 4000, 7)])
+        >>> all(i == roman2int(int2roman(i)) for i in range(-3999, 4000, 7))
         True
-        >>> all([
-        ...     i == roman2int(int2roman(i)) for i in range(1666, 10000, 973)])
+        >>> all(i == roman2int(int2roman(i)) for i in range(1666, 10000, 973))
         Traceback (most recent call last):
             ...
         NotImplementedError: Cannot parse large numbers yet!
