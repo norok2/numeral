@@ -28,7 +28,7 @@ except ImportError:
 # ======================================================================
 # :: Project Details
 INFO = {
-    'author': 'Riccardo Metere <metere@cbs.mpg.de>',
+    'author': 'Riccardo Metere <rick@metere.it>',
     'copyright': 'Copyright (C) 2016',
     'license': 'GNU General Public License version 3 or later (GPLv3+)',
     'notice':
