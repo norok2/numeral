@@ -73,7 +73,7 @@ author = 'Riccardo Metere <rick@metere.it>'
 #
 try:
     from _version import __version__
-except ImportError:
+except:
     from setuptools_scm import get_version
     __version__ = get_version()
 # The short X.Y version.
