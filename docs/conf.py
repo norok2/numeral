@@ -71,7 +71,11 @@ author = 'Riccardo Metere <rick@metere.it>'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-from _version import __version__
+try:
+    from _version import __version__
+except ModuleNotFoundError:
+    from setuptools_scm import get_version
+    __version__ = get_version()
 # The short X.Y version.
 version = '.'.join(__version__.split('.', 2))
 # The full version, including alpha/beta/rc tags.
