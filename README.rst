@@ -43,13 +43,13 @@ The recommended way of installing the software is through
     $ pip install numeral
 
 Alternatively, you can clone the source repository from
-`Bitbucket <https://bitbucket.org/norok2/numeral>`_:
+`GitHub <https://github.com/norok2/numeral>`_:
 
 .. code:: shell
 
     $ mkdir numeral
     $ cd numeral
-    $ git clone git@bitbucket.org:norok2/numeral.git
+    $ git clone git@github.com:norok2/numeral.git
     $ python setup.py install
 
 (some steps may require additional permissions depending on your configuration)
