@@ -92,8 +92,8 @@ setup(
     description='Support for various integer-to-numeral conversion.',
     long_description=LONG_DESCRIPTION_TEXT,
 
-    # use_scm_version=True,
-    version=fix_version(),
+    use_scm_version=True,
+    # version=fix_version(),
 
     url='https://github.com/norok2/' + NAME.lower(),
 
@@ -137,7 +137,7 @@ setup(
 
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
-    use_scm_version = True,
+    # use_scm_version = True,
     setup_requires=[
         'setuptools',
         'setuptools_scm'
