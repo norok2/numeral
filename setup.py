@@ -133,10 +133,11 @@ setup(
         'Programming Language :: Python :: 3',
     ],
 
-    keywords=('numeral', 'letter', 'alphabet', 'numeric', 'arabic', 'roman'),
+    keywords=['numeral', 'letter', 'alphabet', 'numeric', 'arabic', 'roman'],
 
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
+    use_scm_version = True,
     setup_requires=[
         'setuptools',
         'setuptools_scm'
