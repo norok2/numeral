@@ -37,7 +37,7 @@ with open(os.path.join(CWD, README_FILEPATH), encoding='utf-8') as readme_file:
 
 
 # ======================================================================
-def fix_version(
+def _ix_version(
         version=None,
         source_filepath=VERSION_FILEPATH):
     """
