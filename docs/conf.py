@@ -71,12 +71,8 @@ author = 'Riccardo Metere <rick@metere.it>'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-try:
-    from _version import __version__
-except:
-    os.system('pip install setuptools_scm')
-    from setuptools_scm import get_version
-    __version__ = get_version()
+from pkg_resources import get_distribution
+__version__ = get_distribution(project).version
 # The short X.Y version.
 version = '.'.join(__version__.split('.', 2))
 # The full version, including alpha/beta/rc tags.
