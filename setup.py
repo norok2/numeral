@@ -96,7 +96,7 @@ setup(
     # use_scm_version=True,
     # version=fix_version(),
     use_scm_version={
-        'write_to': '_version.py',
+        'write_to': os.path.join(NAME.lower(), '_version.py'),
         'write_to_template': VERSION_FILE_TEMPLATE,
     },
 
