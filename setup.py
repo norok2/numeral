@@ -44,48 +44,6 @@ __version__ = '{version}'
 
 
 # ======================================================================
-def _ix_version(
-        version=None,
-        source_filepath=VERSION_FILEPATH):
-    """
-    Fix version in source code.
-
-    Args:
-        version (str): version to be used for fixing the source code
-        source_filepath (str): Path to file where __version__ is located
-
-    Returns:
-        version (str): the actual version text used
-    """
-
-    def dummy_version():
-        return '0.0.0.0'
-
-    if version is None:
-        try:
-            from setuptools_scm import get_version
-        except ImportError:
-            get_version = dummy_version
-        version = get_version()
-
-    if not os.path.isfile(source_filepath):
-        file_content = VERSION_FILE_TEMPLATE.format(version=version)
-        with open(source_filepath, 'wb') as io_file:
-            io_file.write(file_content.encode('utf-8'))
-    else:
-        with open(source_filepath, 'rb') as io_file:
-            source = io_file.read().decode('utf-8')
-            source = re.sub(
-                r"__version__ = '.*'",
-                "__version__ = '{}'".format(version),
-                source, flags=re.UNICODE)
-        with open(source_filepath, 'wb') as io_file:
-            io_file.write(source.encode('utf-8'))
-
-    return version
-
-
-# ======================================================================
 # :: call the setup tool
 setup(
     name=NAME.lower(),
